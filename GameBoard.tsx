@@ -1,88 +1,157 @@
 import React, {useContext} from "react";
 import ForceGraph2D from "react-force-graph-2d";
-import {Button} from "react-native";
-import {Game, MapNode, Types} from "./App";
+import {FlatList, StyleSheet, Text, View} from "react-native";
+import {Game, getFastestTravel, MapLink, MapNode, Player, PlayerTypes, TransportTypes} from "./App";
 
-function getColor(t: Types) {
+function getColor(t: TransportTypes) {
   switch (t) {
-    case Types.slow:
-      return '#009900';
-      break;
-    case Types.medium:
-      return '#8519ac';
-      break;
-    case Types.fast:
+    case TransportTypes.slow:
       return '#fdf919';
+    case TransportTypes.medium:
+      return '#009900';
+    case TransportTypes.fast:
+      return '#8519ac';
+
+  }
+}
+
+function drawLink(node: MapLink) {
+  return getColor(getFastestTravel(node));
+}
+
+const ThiefMoveItem = (item) => {
+  let itemStyle;
+  let moveType;
+  switch (item.item as TransportTypes) {
+    case TransportTypes.slow:
+      itemStyle = styles.slow;
+      moveType = 'slow';
+      break;
+    case TransportTypes.medium:
+      itemStyle = styles.medium;
+      moveType = 'medium';
+      break;
+    case TransportTypes.fast:
+      itemStyle = styles.fast;
+      moveType = 'fast';
       break;
 
   }
+  return (<Text style={[styles.item, itemStyle]}>{moveType}</Text>);
 }
 
-function drawNode(node: MapNode, ctx: any) {
-  const {id, type, x, y} = node;
-  const types = Array.isArray(type) ? type : [type];
-  ctx.fillStyle = '#ffffff';
-  ctx.font = '4px serif';
-  ctx.fillText(id, x, y);
-  for (const t of types) {
-    ctx.strokeStyle = getColor(t);
-    switch (t) {
-      case Types.slow:
+const ThiefMoves = () => {
+  const {game} = useContext(Game);
+  const thiefMoves = game.thiefMoves;
+  return (<FlatList style={styles.container} data={thiefMoves} renderItem={ThiefMoveItem}></FlatList>);
+}
 
-        ctx.beginPath();
-        ctx.lineWidth = 0.5;
-        ctx.arc(x, y, 2, 0, 2 * Math.PI);
-        ctx.stroke();
-        ctx.closePath();
-        break;
-      case Types.medium:
-        ctx.beginPath();
-        ctx.lineWidth = 0.5;
-        ctx.moveTo(x, y + 2);
-        ctx.lineTo(x + 1.5, y + 4);
-        ctx.lineTo(x - 1.5, y + 4);
-        ctx.lineTo(x, y + 2);
-        ctx.closePath();
-        ctx.stroke();
-        break;
-      case Types.fast:
-        ctx.strokeWidth = 0.5;
-        ctx.strokeRect(x - 2.5, y - 3.5, 5, 1);
-        break;
-    }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    paddingTop: 22,
+    backgroundColor: '#111111'
+  },
+  item: {
+    padding: 10,
+    fontSize: 18,
+    height: 44,
+  },
+  slow: {
+    color: '#fdf919'
+  },
+  medium: {
+    color: '#009900'
+  },
+  fast: {
+    color: '#8519ac'
   }
-
-}
-
-function drawLink(ctx) {
-  const {source: {type: st}, target: {type: tt}} = ctx;
-  let a = new Set(st);
-  let b = new Set(tt);
-  let intersection = new Set(
-    [...a].filter(x => b.has(x)));
-  return getColor([...intersection].sort().reverse()[0]);
-}
+});
 
 export const GameBoard = (props) => {
-  const {game, addLink} = useContext(Game);
+  const {game, movePlayer} = useContext(Game);
 
-  const doUpdate = () => {
-    addLink({source: 4, target: 1});
+  const handleNodeClick = (targetNode) => {
+    movePlayer(targetNode);
   };
+  const getCanvasObject = (node: MapNode, ctx: any) => {
+    const {id, type, x, y} = node;
+    const types = Array.isArray(type) ? type : [type];
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '4px serif';
+    for (const t of types) {
+      ctx.strokeStyle = getColor(t);
+      switch (t) {
+        case TransportTypes.slow:
+          ctx.beginPath();
 
-  return (<>
-    <Button title="Do Something" onPress={doUpdate}>
+          ctx.lineWidth = 0.5;
+          ctx.arc(x, y, 2, 0, 2 * Math.PI);
+          ctx.stroke();
 
-    </Button>
+          ctx.closePath();
+          break;
+        case TransportTypes.medium:
+          ctx.beginPath();
+
+          ctx.lineWidth = 0.75;
+          ctx.arc(x, y, 2.5, 0, 2 * Math.PI);
+          ctx.stroke();
+
+          ctx.closePath();
+          break;
+        case TransportTypes.fast:
+          ctx.beginPath();
+
+          ctx.strokeWidth = 1;
+          ctx.arc(x, y, 3.25, 0, 2 * Math.PI);
+          ctx.stroke();
+
+          ctx.closePath();
+          break;
+      }
+    }
+    // ctx.fillText(id, x, y);
+
+    // now render players
+    if (node.players?.length > 0) {
+      let offset = 0;
+      for (const player of node.players) {
+        ctx.fillText(player.name + `${player.type === PlayerTypes.thief ? '(thief)' : ''}`, x, y + (10 * offset));
+        offset++;
+      }
+    }
+
+    if (node.players?.find((p: Player) => p.name === game.currentTurn.name)) {
+      ctx.fillStyle = '#ffffff';
+
+      ctx.beginPath();
+
+      ctx.lineWidth = 0.5;
+      ctx.arc(x, y, 1, 0, 2 * Math.PI);
+      ctx.fill();
+
+      ctx.closePath();
+    }
+  }
+  const prompt = `${game.currentTurn.name}'s turn`;
+  return (<View>
+    {(!!game.gameStatus?.winner) &&
+    <Text>
+      {game.gameStatus.winner} wins!
+    </Text>}
+    <ThiefMoves></ThiefMoves>
     <ForceGraph2D
       backgroundColor="#000000"
       enableNodeDrag={false}
-      nodeCanvasObject={drawNode}
+      onNodeClick={handleNodeClick}
+      nodeCanvasObject={getCanvasObject}
       linkColor={drawLink}
       graphData={game.map}
     >
 
     </ForceGraph2D>
 
-  </>);
+  </View>);
 };
