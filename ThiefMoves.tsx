@@ -2,7 +2,7 @@ import React, {useContext} from "react";
 import {Game, TransportTypes} from "./App";
 import {FlatList, StyleSheet, Text} from "react-native";
 
-const ThiefMoveItem = (item) => {
+const ThiefMoveItem = (item: any) => {
   let itemStyle;
   let moveType;
   switch (item.item as TransportTypes) {
@@ -31,6 +31,13 @@ export const ThiefMoves = () => {
     renderItem={ThiefMoveItem}
     keyExtractor={(item, index) => index.toString()}/>);
 }
+
+
+export const SLOW_COLOR = '#fdf919';
+export const MEDIUM_COLOR = '#009900';
+export const FAST_COLOR = '#8519ac';
+
+
 const thiefMovesStyles = StyleSheet.create({
   container: {
     flex: 1,
@@ -44,12 +51,12 @@ const thiefMovesStyles = StyleSheet.create({
     height: 44,
   },
   slow: {
-    color: '#fdf919'
+    color: SLOW_COLOR
   },
   medium: {
-    color: '#009900'
+    color: MEDIUM_COLOR
   },
   fast: {
-    color: '#8519ac'
+    color: FAST_COLOR
   }
 });

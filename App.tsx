@@ -50,12 +50,20 @@ function generateGraph(): any {
   };
 }
 
-
 export enum TransportTypes {
   slow = "1_slow",
   medium = "2_medium",
   fast = "3_fast"
 }
+
+const initialState = {
+  map: generateGraph(),
+  players: players,
+  currentTurn: players[0],
+  turnsLeft: 0,
+  thiefMoves: []
+};
+
 
 export interface Player {
   name: string;
@@ -103,13 +111,7 @@ export const Game = React.createContext({
 });
 
 export default function App() {
-  const [game, setGame] = useState({
-    map: generateGraph(),
-    players: players,
-    currentTurn: players[0],
-    turnsLeft: 0,
-    thiefMoves: []
-  });
+  const [game, setGame] = useState(initialState);
 
   const createCurrentPlayerMapper = (player: Player, targetNode: MapNode) => (node: MapNode) => {
     if (node != targetNode) {
@@ -202,12 +204,17 @@ const styles = StyleSheet.create({
   },
 });
 
+export const SLOW_COLOR = '#fdf919';
+export const MEDIUM_COLOR = '#009900';
+export const FAST_COLOR = '#8519ac';
+
+
 export interface MapLink extends LinkObject {
   source: MapNode,
   target: MapNode
 }
 
-export function getFastestTravel(node: MapLink) {
+export function getFastestTravel(node: LinkObject) {
   const {source: {type: st}, target: {type: tt}} = node;
   let a = new Set(st);
   let b = new Set(tt);
