@@ -1,7 +1,8 @@
-import React, {useContext} from "react";
-import ForceGraph2D from "react-force-graph-2d";
-import {FlatList, StyleSheet, Text, View} from "react-native";
-import {Game, getFastestTravel, MapLink, MapNode, Player, PlayerTypes, TransportTypes} from "./App";
+import React, {useContext, useRef} from "react";
+import ForceGraph2D, {LinkObject} from "react-force-graph-2d";
+import {StyleSheet, Text, View} from "react-native";
+import {Game, getFastestTravel, MapNode, Player, PlayerTypes, TransportTypes} from "./App";
+import {ThiefMoves} from "./ThiefMoves";
 
 function getColor(t: TransportTypes) {
   switch (t) {
@@ -15,59 +16,32 @@ function getColor(t: TransportTypes) {
   }
 }
 
-function drawLink(node: MapLink) {
-  return getColor(getFastestTravel(node));
-}
-
-const ThiefMoveItem = (item) => {
-  let itemStyle;
-  let moveType;
-  switch (item.item as TransportTypes) {
-    case TransportTypes.slow:
-      itemStyle = styles.slow;
-      moveType = 'slow';
-      break;
-    case TransportTypes.medium:
-      itemStyle = styles.medium;
-      moveType = 'medium';
-      break;
-    case TransportTypes.fast:
-      itemStyle = styles.fast;
-      moveType = 'fast';
-      break;
-
-  }
-  return (<Text style={[styles.item, itemStyle]}>{moveType}</Text>);
-}
-
-const ThiefMoves = () => {
-  const {game} = useContext(Game);
-  const thiefMoves = game.thiefMoves;
-  return (<FlatList style={styles.container} data={thiefMoves} renderItem={ThiefMoveItem}></FlatList>);
+function drawLink(linkObject: LinkObject) {
+  return getColor(getFastestTravel(linkObject));
 }
 
 
-const styles = StyleSheet.create({
+const pageStyles = StyleSheet.create({
   container: {
-    flex: 1,
-    paddingTop: 22,
-    backgroundColor: '#111111'
+    // height: '100vh',
+    // width: '100vw'
   },
-  item: {
-    padding: 10,
-    fontSize: 18,
-    height: 44,
-  },
-  slow: {
-    color: '#fdf919'
-  },
-  medium: {
-    color: '#009900'
-  },
-  fast: {
-    color: '#8519ac'
+  overlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    width: '100vw',
+    height: '100vh'
   }
 });
+
+export const GameOverPanel = ({game}) => {
+  return (
+    !!game.gameStatus?.winner &&
+    <Text>
+      {game.gameStatus.winner} wins!
+    </Text>) || '';
+}
 
 export const GameBoard = (props) => {
   const {game, movePlayer} = useContext(Game);
@@ -135,23 +109,20 @@ export const GameBoard = (props) => {
       ctx.closePath();
     }
   }
-  const prompt = `${game.currentTurn.name}'s turn`;
-  return (<View>
-    {(!!game.gameStatus?.winner) &&
-    <Text>
-      {game.gameStatus.winner} wins!
-    </Text>}
-    <ThiefMoves></ThiefMoves>
+
+  let fgRef = useRef();
+  return (<View style={pageStyles.container}>
+    <GameOverPanel game={game}/>
+    <ThiefMoves/>
     <ForceGraph2D
+      ref={fgRef}
       backgroundColor="#000000"
+      onEngineStop={() => fgRef.current.zoomToFit(40)}
       enableNodeDrag={false}
       onNodeClick={handleNodeClick}
       nodeCanvasObject={getCanvasObject}
       linkColor={drawLink}
       graphData={game.map}
-    >
-
-    </ForceGraph2D>
-
+    />
   </View>);
 };

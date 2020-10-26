@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {StyleSheet, View} from 'react-native';
-import {NodeObject} from "react-force-graph-2d";
+import {LinkObject, NodeObject} from "react-force-graph-2d";
 import {GameBoard} from "./GameBoard";
 
 
@@ -70,7 +70,20 @@ export interface MapNode extends NodeObject {
   players: Player[];
 }
 
+export interface GameStatus {
+  status: string;
+  winner: string;
+}
+
 export interface GameState {
+  gameStatus: GameStatus;
+  thiefMoves: TransportTypes[];
+  players: Player[];
+  currentTurn: Player;
+  map: {
+    links: MapLink[];
+    nodes: MapNode[];
+  };
 
 }
 
@@ -89,9 +102,7 @@ export const Game = React.createContext({
   }
 });
 
-
 export default function App() {
-
   const [game, setGame] = useState({
     map: generateGraph(),
     players: players,
@@ -109,7 +120,7 @@ export default function App() {
     return node;
   }
 
-  const checkWinState = (targetNode: MapNode, currentGame: GameState) => {
+  const checkWinState = (targetNode: MapNode, currentGame: GameState): GameStatus | undefined => {
     if (targetNode.players.find((p: Player) => p.type === PlayerTypes.thief)) {
       // if anyone is moving to a node where the thief is at, the game is over.
       return {
@@ -127,9 +138,25 @@ export default function App() {
     }
   }
 
-  const movePlayer = (targetNode: MapNode) => {
-    setGame((currentGame) => {
+  function checkValidMove(targetNode: MapNode, currentGame: GameState): boolean {
 
+    if (currentGame.gameStatus?.status) {
+      return false;
+    }
+
+    const playersCurrentNode = currentGame.map.nodes.find(n => n.players.find(p => p.name === currentGame.currentTurn.name));
+    const availableTargetNodes = currentGame.map.links.filter(l => l.source === playersCurrentNode || l.target === playersCurrentNode)
+      .map(l => l.source === playersCurrentNode ? l.target : l.source);
+    if (availableTargetNodes.find(n => n === targetNode)) {
+      return true;
+    }
+    return false;
+  }
+
+  const movePlayer = (targetNode: MapNode) => {
+    setGame((currentGame: GameState) => {
+
+      if (!checkValidMove(targetNode, currentGame)) return currentGame;
       const isOver = checkWinState(targetNode, currentGame);
 
       const sourceNode = currentGame.map.nodes.find((n: MapNode) => n.players.find((p: Player) => p.name === currentGame.currentTurn.name))
@@ -175,7 +202,7 @@ const styles = StyleSheet.create({
   },
 });
 
-export interface MapLink {
+export interface MapLink extends LinkObject {
   source: MapNode,
   target: MapNode
 }
