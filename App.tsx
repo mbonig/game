@@ -1,19 +1,51 @@
-import React, {useState} from 'react';
-import {StyleSheet, View} from 'react-native';
-import {LinkObject, NodeObject} from "react-force-graph-2d";
+import 'react-native-gesture-handler';
+import React, {useEffect, useState} from 'react';
+import {Text, View} from 'react-native';
+import {LinkObject} from "react-force-graph-2d";
 import {GameBoard} from "./GameBoard";
 
+import Amplify, {API, graphqlOperation} from 'aws-amplify'
+import config from './aws-exports'
+import {NavigationContainer} from "@react-navigation/native";
+import {createStackNavigator} from "@react-navigation/stack";
+import {NewGame} from "./NewGame";
+import {styles} from "./styles";
+import {GameState, MapNode, PlayerTypes, TransportTypes} from "./models";
+import {HomeScreen} from "./Home";
+import {WaitingRoom} from "./WaitingRoom";
+import {JoinGame} from "./JoinGame";
+import {makeMove, onGameStateChange} from "./queries";
 
-export enum PlayerTypes {
-  thief,
-  cop
-}
+Amplify.configure(config)
+const Stack = createStackNavigator();
 
 const players = [
   {name: 'zach', type: PlayerTypes.thief},
   {name: 'matt', type: PlayerTypes.cop},
   {name: 'steve', type: PlayerTypes.cop}
 ];
+
+export const User = React.createContext({
+  username: "", setUsername: (username) => {
+  }
+});
+let defaultValue: GameState = {
+  currentTurn: {name: ''},
+  gameStatus: {
+    status: '',
+    winner: ''
+  },
+  players: [],
+  map: {nodes: [], links: []},
+  thiefMoves: []
+};
+export const Game = React.createContext({
+  game: defaultValue,
+  movePlayer: (targetNode: MapNode) => {
+  },
+  setGame: (game: GameState) => {
+  },
+});
 
 
 function generateGraph(): any {
@@ -50,13 +82,8 @@ function generateGraph(): any {
   };
 }
 
-export enum TransportTypes {
-  slow = "1_slow",
-  medium = "2_medium",
-  fast = "3_fast"
-}
-
 const initialState = {
+  id: "",
   map: generateGraph(),
   players: players,
   currentTurn: players[0],
@@ -65,154 +92,59 @@ const initialState = {
 };
 
 
-export interface Player {
-  name: string;
-  type: PlayerTypes;
-}
+const FindGame = () => (<Text>Find Game...</Text>);
 
-export interface MapNode extends NodeObject {
-  id: string;
-  x: number;
-  y: number;
-  type: TransportTypes[];
-  players: Player[];
-}
-
-export interface GameStatus {
-  status: string;
-  winner: string;
-}
-
-export interface GameState {
-  gameStatus: GameStatus;
-  thiefMoves: TransportTypes[];
-  players: Player[];
-  currentTurn: Player;
-  map: {
-    links: MapLink[];
-    nodes: MapNode[];
-  };
-
-}
-
-export const Game = React.createContext({
-  game: {
-    currentTurn: {name: '', type: ''},
-    gameStatus: {
-      status: '',
-      winner: ''
-    },
-    map: {nodes: [], links: []},
-    thiefMoves: []
-  },
-  movePlayer: (targetNode: MapNode) => {
-
-  }
-});
 
 export default function App() {
   const [game, setGame] = useState(initialState);
+  const [username, setUsername] = useState("");
 
-  const createCurrentPlayerMapper = (player: Player, targetNode: MapNode) => (node: MapNode) => {
-    if (node != targetNode) {
-      node.players = node.players.filter(p => p.name !== player.name) ?? [];
-    } else {
-      node.players = [...node.players, player];
-    }
-    return node;
-  }
+  useEffect(() => {
+    const subscriber = API.graphql(graphqlOperation(onGameStateChange, {id: game.id})).subscribe({
+      next: data => {
+        const game = data.value.data.onGameStateChange;
+        setGame(game);
+      }
+    });
+    return () => subscriber.unsubscribe()
+  }, []);
 
-  const checkWinState = (targetNode: MapNode, currentGame: GameState): GameStatus | undefined => {
-    if (targetNode.players.find((p: Player) => p.type === PlayerTypes.thief)) {
-      // if anyone is moving to a node where the thief is at, the game is over.
-      return {
-        status: 'Finished',
-        winner: 'Cops'
-      };
-    }
-
-    if (targetNode.players.find((p: Player) => p.type === PlayerTypes.cop) && game.currentTurn.type === PlayerTypes.thief) {
-      // if the thief moves to a node that is occupied, then also game over.
-      return {
-        status: 'Finished',
-        winner: 'Cops'
-      };
-    }
-  }
-
-  function checkValidMove(targetNode: MapNode, currentGame: GameState): boolean {
-
-    if (currentGame.gameStatus?.status) {
-      return false;
-    }
-
-    const playersCurrentNode = currentGame.map.nodes.find(n => n.players.find(p => p.name === currentGame.currentTurn.name));
-    const availableTargetNodes = currentGame.map.links.filter(l => l.source === playersCurrentNode || l.target === playersCurrentNode)
-      .map(l => l.source === playersCurrentNode ? l.target : l.source);
-    if (availableTargetNodes.find(n => n === targetNode)) {
-      return true;
-    }
-    return false;
-  }
 
   const movePlayer = (targetNode: MapNode) => {
-    setGame((currentGame: GameState) => {
-
-      if (!checkValidMove(targetNode, currentGame)) return currentGame;
-      const isOver = checkWinState(targetNode, currentGame);
-
-      const sourceNode = currentGame.map.nodes.find((n: MapNode) => n.players.find((p: Player) => p.name === currentGame.currentTurn.name))
-      const moveType = getFastestTravel({target: targetNode, source: sourceNode});
-      const isThief = currentGame.currentTurn.type === PlayerTypes.thief;
-      let currentIndex = currentGame.players.indexOf(currentGame.currentTurn);
-      if (currentIndex >= currentGame.players.length - 1) {
-        currentIndex = -1;
-      }
-
-      let currentPlayer = currentGame.currentTurn;
-      let currentMap = currentGame.map;
-      const thiefMoves = isThief ? [...(currentGame.thiefMoves ?? []), moveType] : currentGame.thiefMoves;
-      return {
-        ...currentGame,
-        currentTurn: currentGame.players[currentIndex + 1],
-        map: {
-          nodes: currentMap.nodes.map(createCurrentPlayerMapper(currentPlayer, targetNode)),
-          links: [...currentMap.links]
-        },
-        gameStatus: isOver,
-        thiefMoves
-      };
-    });
+    API.graphql(graphqlOperation(makeMove, {id: game.id, myself: username, targetNodeId: targetNode.id}));
   };
 
-  return (
+
+  const GameScreen = () => (
     <View style={styles.container}>
-      <Game.Provider value={{game, movePlayer}}>
-        <GameBoard>
-        </GameBoard>
-      </Game.Provider>
+      <GameBoard>
+      </GameBoard>
     </View>
   );
+
+
+  return (
+    <User.Provider value={{username, setUsername}}>
+      <Game.Provider value={{game, movePlayer, setGame}}>
+        <NavigationContainer>
+          <Stack.Navigator>
+            <Stack.Screen
+              name="Home"
+              component={HomeScreen}
+            />
+            <Stack.Screen name="New Game" component={NewGame}/>
+            <Stack.Screen name="Waiting Room" component={WaitingRoom}/>
+            <Stack.Screen name="Join Game" component={JoinGame}/>
+            <Stack.Screen name="Find Game" component={FindGame}/>
+            <Stack.Screen name="Game" component={GameScreen}/>
+          </Stack.Navigator>
+        </NavigationContainer>
+      </Game.Provider>
+    </User.Provider>
+  );
+
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
-
-export const SLOW_COLOR = '#fdf919';
-export const MEDIUM_COLOR = '#009900';
-export const FAST_COLOR = '#8519ac';
-
-
-export interface MapLink extends LinkObject {
-  source: MapNode,
-  target: MapNode
-}
 
 export function getFastestTravel(node: LinkObject) {
   const {source: {type: st}, target: {type: tt}} = node;

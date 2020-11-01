@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "auth": {
+      "ethrwars76625525": [
+        "create",
+        "read",
+        "update",
+        "delete"
+      ]
+    }
+  },
+  "lambdaLayers": []
+}

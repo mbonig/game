@@ -1,6 +1,7 @@
 import React, {useContext} from "react";
-import {Game, TransportTypes} from "./App";
+import {Game} from "./App";
 import {FlatList, StyleSheet, Text} from "react-native";
+import {TransportTypes} from "./models";
 
 const ThiefMoveItem = (item: any) => {
   let itemStyle;

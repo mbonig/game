@@ -1,18 +1,12 @@
-import React, {useContext, useRef} from "react";
+import React, {useContext, useEffect, useRef} from "react";
 import ForceGraph2D, {LinkObject} from "react-force-graph-2d";
 import {Modal, StyleSheet, Text, View} from "react-native";
-import {
-  FAST_COLOR,
-  Game,
-  GameState,
-  getFastestTravel,
-  MapNode,
-  MEDIUM_COLOR,
-  PlayerTypes,
-  SLOW_COLOR,
-  TransportTypes
-} from "./App";
+import {Game, getFastestTravel,} from "./App";
 import {ThiefMoves} from "./ThiefMoves";
+import {FAST_COLOR, MEDIUM_COLOR, SLOW_COLOR} from "./styles";
+import {GameState, MapNode, PlayerTypes, TransportTypes} from "./models";
+import {API, graphqlOperation} from "aws-amplify";
+import {onGameStateChange} from "./queries";
 
 function getColor(t: TransportTypes) {
   switch (t) {
@@ -46,8 +40,8 @@ export const GameOverPanel = ({game}: { game: GameState }) => {
 
 }
 
-export const GameBoard = (props) => {
-  const {game, movePlayer} = useContext(Game);
+export const GameBoard = ({navigation}) => {
+  const {game, setGame, movePlayer} = useContext(Game);
 
   const handleNodeClick = (targetNode) => {
     movePlayer(targetNode);
@@ -105,6 +99,17 @@ export const GameBoard = (props) => {
     }
   }
 
+  useEffect(() => {
+    const subscriber = API.graphql(graphqlOperation(onGameStateChange, {id: game.id})).subscribe({
+      next: data => {
+        const game = data.value.data.onGameStateChange;
+        setGame(game);
+      }
+    });
+    return () => subscriber.unsubscribe()
+  }, []);
+
+
   let fgRef = useRef();
   return (<View style={pageStyles.container}>
     <GameOverPanel game={game}/>
@@ -112,6 +117,7 @@ export const GameBoard = (props) => {
     <ForceGraph2D
       ref={fgRef}
       backgroundColor="#000000"
+      linkWidth={3}
       enableNodeDrag={false}
       onNodeClick={handleNodeClick}
       nodeCanvasObject={getCanvasObject}

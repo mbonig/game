@@ -1,0 +1,58 @@
+schema {
+    query: Query
+    mutation: Mutation
+    subscription: Subscription
+}
+
+
+type GameStatus {
+    status: String!
+    winner: String!
+}
+
+type Player {
+    name: String!
+    type: String
+}
+
+type MapLink {
+    source: Int!
+    target: Int!
+}
+
+type MapNode {
+    id: Int!
+    players: [Player!]
+    type: [String!]
+}
+
+type Map {
+    links: [MapLink!]
+    nodes: [MapNode!]
+}
+
+type Game
+{
+  id: ID!
+  status: String
+  gameStatus: GameStatus
+  thiefMoves: [String!]
+  players: [Player!]!
+  currentTurn: Player
+  map: Map
+}
+
+type Query {
+    waitingRoom: [Game]
+}
+
+type Mutation {
+    createGame(myself: String!): Game @function(name: "creategame-${env}")
+    startGame(id: ID!): Game @function(name: "startgame-${env}")
+    joinGame(id: ID!, myself: String!): Game @function(name: "joingame-${env}")
+    makeMove(id: ID!, myself: String!, targetNodeId: Int!): Game @function(name: "makemove-${env}")
+}
+
+type Subscription {
+    onGameStateChange(id: ID!): Game @aws_subscribe (mutations: ["makeMove", "joinGame", "startGame"])
+}

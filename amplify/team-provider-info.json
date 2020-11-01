@@ -10,6 +10,11 @@
       "StackName": "amplify-ethrwars-dev-140615",
       "StackId": "arn:aws:cloudformation:us-east-1:536309290949:stack/amplify-ethrwars-dev-140615/b580e960-17c6-11eb-a7dd-0a6a26cca077",
       "AmplifyAppId": "d2h25ekztjlx10"
+    },
+    "categories": {
+      "auth": {
+        "ethrwars76625525": {}
+      }
     }
   }
 }
