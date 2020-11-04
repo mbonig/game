@@ -24,6 +24,10 @@ export const onGameStateChange = /* GraphQL */ `
         nodes {
           id
           type
+          fx
+          fy
+          x
+          y
           players {
             name
             type
@@ -58,6 +62,10 @@ export const startGame = /* GraphQL */ `
         }
         nodes {
           id
+          fx
+          fy
+          x
+          y
           players {
             name
             type
@@ -93,6 +101,49 @@ export const makeMove = /* GraphQL */ `
         nodes {
           id
           type
+          fx
+          fy
+          x
+          y
+          players {
+            name
+            type
+          }
+        }
+      }
+    }
+  }
+`;
+export const joinGame = /* GraphQL */ `
+  mutation JoinGame($id: ID!, $myself: String!) {
+    joinGame(id: $id, myself: $myself) {
+      id
+      status
+      gameStatus {
+        status
+        winner
+      }
+      thiefMoves
+      players {
+        name
+        type
+      }
+      currentTurn {
+        name
+        type
+      }
+      map {
+        links {
+          source
+          target
+        }
+        nodes {
+          id
+          type
+          fx
+          fy
+          x
+          y
           players {
             name
             type

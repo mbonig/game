@@ -28,6 +28,10 @@ export const onGameStateChange = /* GraphQL */ `
         nodes {
           id
           type
+          fx
+          fy
+          x
+          y
         }
       }
     }

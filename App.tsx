@@ -1,6 +1,6 @@
 import 'react-native-gesture-handler';
-import React, {useEffect, useState} from 'react';
-import {Text, View} from 'react-native';
+import React, {useState} from 'react';
+import {View} from 'react-native';
 import {LinkObject} from "react-force-graph-2d";
 import {GameBoard} from "./GameBoard";
 
@@ -14,7 +14,8 @@ import {GameState, MapNode, PlayerTypes, TransportTypes} from "./models";
 import {HomeScreen} from "./Home";
 import {WaitingRoom} from "./WaitingRoom";
 import {JoinGame} from "./JoinGame";
-import {makeMove, onGameStateChange} from "./queries";
+import {makeMove} from "./queries";
+import {FindGame} from "./FindGame";
 
 Amplify.configure(config)
 const Stack = createStackNavigator();
@@ -45,6 +46,10 @@ export const Game = React.createContext({
   },
   setGame: (game: GameState) => {
   },
+  updateGame: (game: GameState) => {
+  },
+  setNodePosition: (node: MapNode) => {
+  }
 });
 
 
@@ -92,23 +97,30 @@ const initialState = {
 };
 
 
-const FindGame = () => (<Text>Find Game...</Text>);
-
-
 export default function App() {
   const [game, setGame] = useState(initialState);
   const [username, setUsername] = useState("");
 
-  useEffect(() => {
-    const subscriber = API.graphql(graphqlOperation(onGameStateChange, {id: game.id})).subscribe({
-      next: data => {
-        const game = data.value.data.onGameStateChange;
-        setGame(game);
-      }
-    });
-    return () => subscriber.unsubscribe()
-  }, []);
+  const updateGame = (newGame) => {
+    setGame(newGame);
+  };
 
+  // useEffect(() => {
+  //   const subscriber = API.graphql(graphqlOperation(onGameStateChange, {id: game.id})).subscribe({
+  //     next: data => {
+  //       const game = data.value.data.onGameStateChange;
+  //       setGame(game);
+  //     }
+  //   });
+  //   return () => subscriber.unsubscribe()
+  // }, [game]);
+
+  const setNodePosition = (node: MapNode) => {
+    const theNode = game.map.nodes.find((n) => n.id === node.id);
+    theNode.x = node.x;
+    theNode.y = node.y;
+    // setGame(game);
+  };
 
   const movePlayer = (targetNode: MapNode) => {
     API.graphql(graphqlOperation(makeMove, {id: game.id, myself: username, targetNodeId: targetNode.id}));
@@ -125,9 +137,9 @@ export default function App() {
 
   return (
     <User.Provider value={{username, setUsername}}>
-      <Game.Provider value={{game, movePlayer, setGame}}>
+      <Game.Provider value={{game, movePlayer, setGame, updateGame: updateGame, setNodePosition}}>
         <NavigationContainer>
-          <Stack.Navigator>
+          <Stack.Navigator detachInactiveScreens={true}>
             <Stack.Screen
               name="Home"
               component={HomeScreen}

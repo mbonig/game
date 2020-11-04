@@ -28,6 +28,14 @@ export const waitingRoom = /* GraphQL */ `
         nodes {
           id
           type
+          players {
+            name
+            type
+          }
+          fx
+          fy
+          x
+          y
         }
       }
     }

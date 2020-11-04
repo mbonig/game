@@ -24,6 +24,10 @@ type MapNode {
     id: Int!
     players: [Player!]
     type: [String!]
+    fx: Float
+    fy: Float
+    x: Float
+    y: Float
 }
 
 type Map {

@@ -28,6 +28,10 @@ export const createGame = /* GraphQL */ `
         nodes {
           id
           type
+          fx
+          fy
+          x
+          y
         }
       }
     }
@@ -59,6 +63,10 @@ export const startGame = /* GraphQL */ `
         nodes {
           id
           type
+          fx
+          fy
+          x
+          y
         }
       }
     }
@@ -90,6 +98,10 @@ export const joinGame = /* GraphQL */ `
         nodes {
           id
           type
+          fx
+          fy
+          x
+          y
         }
       }
     }
@@ -121,6 +133,10 @@ export const makeMove = /* GraphQL */ `
         nodes {
           id
           type
+          fx
+          fy
+          x
+          y
         }
       }
     }

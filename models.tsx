@@ -8,8 +8,8 @@ export enum TransportTypes {
 }
 
 export enum PlayerTypes {
-  thief,
-  cop
+  thief = "thief",
+  cop = "cop"
 }
 
 export interface Player {

@@ -22,9 +22,7 @@ const ThiefMoveItem = (item: any) => {
   }
   return (<Text style={[thiefMovesStyles.item, itemStyle]}>{moveType}</Text>);
 }
-export const ThiefMoves = () => {
-  const {game} = useContext(Game);
-  const thiefMoves = game.thiefMoves;
+export const ThiefMoves = ({thiefMoves}) => {
   return (<FlatList
     horizontal={true}
     style={thiefMovesStyles.container}

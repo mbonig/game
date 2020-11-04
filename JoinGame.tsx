@@ -1,9 +1,9 @@
 import {Button, Text, TextInput, View} from "react-native";
 import React, {useContext, useState} from "react";
 import {API, graphqlOperation} from "aws-amplify";
-import {joinGame} from "./graphql/mutations";
 import {Game, User} from "./App";
 import {styles} from "./styles";
+import {joinGame} from "./queries";
 
 export const JoinGame = ({navigation}) => {
   const {setGame} = useContext(Game);
