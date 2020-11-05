@@ -34,7 +34,7 @@ export function WaitingRoom({navigation}) {
     navigation.navigate("Game");
   }
 
-  async function onPress() {
+  async function onStartPress() {
     const {data: {startGame: newGame}} = await API.graphql(graphqlOperation(startGame, {id: game.id}));
     setGame(newGame);
     navigation.navigate('Game');
@@ -49,7 +49,7 @@ export function WaitingRoom({navigation}) {
         renderItem={PlayerItem}
         keyExtractor={({name}) => name}
       />
-      <SimpleButton text="Start" onPress={onPress}></SimpleButton>
+      <SimpleButton text="Start" onPress={onStartPress}></SimpleButton>
     </View>
   );
 }

@@ -39,18 +39,23 @@ export const GameOverPanel = ({game}: { game: GameState }) => {
   );
 }
 
+const currentTurnStyles = StyleSheet.create({
+  container: {
+    backgroundColor: '#000000',
+    color: '#aaaaaa'
+  }
+});
+
 const CurrentTurn = () => {
   const {game} = useContext(Game);
   const {username} = useContext(User);
-  if (game.currentTurn.name === username){
-    return <Text>Your turn!</Text>
-  }
-  return (<Text>{game.currentTurn.name}'s turn.</Text>);
+  const prompt = game.currentTurn.name === username ? 'Your turn!' : `${game.currentTurn.name}'s turn`
+  return <Text style={currentTurnStyles.container}>{prompt}</Text>
 }
 
 export const GameBoard = ({}) => {
   const {game, setGame, movePlayer} = useContext(Game);
-  const { username } = useContext(User);
+  const {username} = useContext(User);
 
 
   const handleNodeClick = (targetNode: MapNode) => {
@@ -103,7 +108,7 @@ export const GameBoard = ({}) => {
       for (const player of node.players) {
         let numberOfThiefMoves = game.thiefMoves.length;
 
-        if (player.name !== username){
+        if (!game.gameStatus?.status && player.name !== username) {
           if (player.type === PlayerTypes.thief && numberOfThiefMoves !== 2 && numberOfThiefMoves !== 8) {
             continue;
           }
@@ -111,7 +116,8 @@ export const GameBoard = ({}) => {
 
         // if the player is me, no matter what, render it
         ctx.fillStyle = '#ffffff';
-        const playerSize = player.name.length * 2;
+        const playerName = player.name + `${player.type === PlayerTypes.thief ? '(thief)' : ''}`
+        const playerSize = playerName.length * 2;
         if (player.name === game.currentTurn.name) {
 
           ctx.fillStyle = '#00f7ff';
@@ -125,10 +131,10 @@ export const GameBoard = ({}) => {
         ctx.fillStyle = '#ffffff';
 
         if (player.type === PlayerTypes.thief) {
-          ctx.fillStyle = "#aa0000";
+          ctx.fillStyle = "#fa5454";
         }
 
-        ctx.fillText(player.name + `${player.type === PlayerTypes.thief ? '(thief)' : ''}`, x - (playerSize / 2), y + (-5 * offset));
+        ctx.fillText(playerName, x - (playerSize / 2), y + (-5 * offset));
         offset++;
       }
     }
@@ -153,12 +159,6 @@ export const GameBoard = ({}) => {
   }, [game]);
   let fgRef = useRef();
 
-  // const handleBackgroundClick = (args)=>{
-  //   // do locally for now.
-  //   const coords = fgRef.current.screen2GraphCoords(args.x, args.y)
-  //   setGame({...game, copMarkers: [{player: username, ...coords}]})
-  //   console.log(args);
-  // }
 
   return (<View style={pageStyles.container}>
     <GameOverPanel game={game}/>

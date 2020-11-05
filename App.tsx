@@ -129,7 +129,20 @@ export default function App() {
             <Stack.Screen name="Waiting Room" component={WaitingRoom}/>
             <Stack.Screen name="Join Game" component={JoinGame}/>
             <Stack.Screen name="Find Game" component={FindGame}/>
-            <Stack.Screen name="Game" component={GameScreen}/>
+            <Stack.Screen
+              name="Game"
+              component={GameScreen}
+              options={{
+                headerStyle: {
+                  backgroundColor: '#000000'
+                },
+                headerTintColor: '#aaaaaa',
+                headerTitleStyle: {
+                  fontWeight: 'bold',
+                  color: '#aaaaaa'
+                },
+              }}
+            />
           </Stack.Navigator>
         </NavigationContainer>
       </Game.Provider>
