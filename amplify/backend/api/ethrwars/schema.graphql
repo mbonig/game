@@ -35,12 +35,17 @@ type Map {
     nodes: [MapNode!]
 }
 
+type ThiefMove {
+    type: String!
+    nodeId: String!
+}
+
 type Game
 {
   id: ID!
   status: String
   gameStatus: GameStatus
-  thiefMoves: [String!]
+  thiefMoves: [ThiefMove!]
   players: [Player!]!
   currentTurn: Player
   map: Map

@@ -11,7 +11,10 @@ export const createGame = /* GraphQL */ `
         status
         winner
       }
-      thiefMoves
+      thiefMoves {
+        type
+        nodeId
+      }
       players {
         name
         type
@@ -46,7 +49,10 @@ export const startGame = /* GraphQL */ `
         status
         winner
       }
-      thiefMoves
+      thiefMoves {
+        type
+        nodeId
+      }
       players {
         name
         type
@@ -81,7 +87,10 @@ export const joinGame = /* GraphQL */ `
         status
         winner
       }
-      thiefMoves
+      thiefMoves {
+        type
+        nodeId
+      }
       players {
         name
         type
@@ -116,7 +125,10 @@ export const makeMove = /* GraphQL */ `
         status
         winner
       }
-      thiefMoves
+      thiefMoves {
+        type
+        nodeId
+      }
       players {
         name
         type

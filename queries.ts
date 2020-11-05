@@ -7,7 +7,10 @@ export const onGameStateChange = /* GraphQL */ `
         status
         winner
       }
-      thiefMoves
+      thiefMoves {
+        type
+        nodeId
+      }
       players {
         name
         type
@@ -26,8 +29,6 @@ export const onGameStateChange = /* GraphQL */ `
           type
           fx
           fy
-          x
-          y
           players {
             name
             type
@@ -46,7 +47,10 @@ export const startGame = /* GraphQL */ `
         status
         winner
       }
-      thiefMoves
+      thiefMoves {
+        type
+        nodeId
+      }
       players {
         name
         type
@@ -64,13 +68,10 @@ export const startGame = /* GraphQL */ `
           id
           fx
           fy
-          x
-          y
           players {
             name
             type
           }
-          type
         }
       }
     }
@@ -84,7 +85,10 @@ export const makeMove = /* GraphQL */ `
         status
         winner
       }
-      thiefMoves
+      thiefMoves {
+        type
+        nodeId
+      }
       players {
         name
         type
@@ -103,8 +107,6 @@ export const makeMove = /* GraphQL */ `
           type
           fx
           fy
-          x
-          y
           players {
             name
             type
@@ -123,7 +125,10 @@ export const joinGame = /* GraphQL */ `
         status
         winner
       }
-      thiefMoves
+      thiefMoves {
+        type
+        nodeId
+      }
       players {
         name
         type
@@ -142,8 +147,6 @@ export const joinGame = /* GraphQL */ `
           type
           fx
           fy
-          x
-          y
           players {
             name
             type

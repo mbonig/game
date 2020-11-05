@@ -13,7 +13,11 @@ function checkValidMove(targetNode, currentGame) {
   if (availableTargetNodes.find(n => n === targetNode.id)) {
     return true;
   }
-  console.log("Couldn't find the target node in the list of availableTargetNodes",{targetNode, playersCurrentNode, availableTargetNodes});
+  console.log("Couldn't find the target node in the list of availableTargetNodes", {
+    targetNode,
+    playersCurrentNode,
+    availableTargetNodes
+  });
   return false;
 }
 
@@ -81,14 +85,17 @@ exports.handler = async (event) => {
   const sourceNode = currentGame.map.nodes.find((n) => n.players.find((p) => p.name === currentGame.currentTurn.name));
   const moveType = getFastestTravel({target: targetNode, source: sourceNode});
   const isThief = currentGame.currentTurn.type === PlayerTypes.thief;
-  let currentIndex = currentGame.players.findIndex(x=>x.name === currentGame.currentTurn.name);
+  let currentIndex = currentGame.players.findIndex(x => x.name === currentGame.currentTurn.name);
   if (currentIndex >= currentGame.players.length - 1) {
     currentIndex = -1;
   }
 
   let currentPlayer = currentGame.currentTurn;
   let currentMap = currentGame.map;
-  const thiefMoves = isThief ? [...(currentGame.thiefMoves || []), moveType] : currentGame.thiefMoves;
+  const thiefMoves = isThief ? [...(currentGame.thiefMoves || []), {
+    type: moveType,
+    nodeId: targetNode.id
+  }] : currentGame.thiefMoves;
   const newGame = {
     ...currentGame,
     currentTurn: currentGame.players[currentIndex + 1],

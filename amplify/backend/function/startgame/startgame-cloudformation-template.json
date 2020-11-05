@@ -79,7 +79,7 @@
         "Timeout": "25",
         "Code": {
           "S3Bucket": "amplify-ethrwars-dev-140615-deployment",
-          "S3Key": "amplify-builds/startgame-45426970586e787a6d38-build.zip"
+          "S3Key": "amplify-builds/startgame-386b5a464d542f4f5a58-build.zip"
         }
       }
     },

@@ -11,7 +11,10 @@ export const waitingRoom = /* GraphQL */ `
         status
         winner
       }
-      thiefMoves
+      thiefMoves {
+        type
+        nodeId
+      }
       players {
         name
         type
@@ -28,14 +31,14 @@ export const waitingRoom = /* GraphQL */ `
         nodes {
           id
           type
-          players {
-            name
-            type
-          }
           fx
           fy
           x
           y
+          players {
+            name
+            type
+          }
         }
       }
     }

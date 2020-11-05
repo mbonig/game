@@ -42,19 +42,24 @@ export const GameOverPanel = ({game}: { game: GameState }) => {
 const CurrentTurn = () => {
   const {game} = useContext(Game);
   const {username} = useContext(User);
+  if (game.currentTurn.name === username){
+    return <Text>Your turn!</Text>
+  }
   return (<Text>{game.currentTurn.name}'s turn.</Text>);
 }
 
-export const GameBoard = ({navigation}) => {
-  const {game, setGame, updateGame, movePlayer, setNodePosition} = useContext(Game);
+export const GameBoard = ({}) => {
+  const {game, setGame, movePlayer} = useContext(Game);
   const { username } = useContext(User);
 
+
   const handleNodeClick = (targetNode: MapNode) => {
+    console.log(targetNode);
+
     movePlayer(targetNode);
   };
   const getCanvasObject = (node: MapNode, ctx: any) => {
     const {id, type, x, y} = node;
-    setNodePosition(node);
     const types = Array.isArray(type) ? type : [type];
     ctx.fillStyle = '#ffffff';
     ctx.font = '4px serif';
@@ -98,9 +103,10 @@ export const GameBoard = ({navigation}) => {
       for (const player of node.players) {
         let numberOfThiefMoves = game.thiefMoves.length;
 
-        // if the player is not me, and it's the thief, only render it if it's the 3rd, 8th, or 13th (etc) turn
-        if (player.name !== username && player.type === PlayerTypes.thief && numberOfThiefMoves !== 2 && numberOfThiefMoves !== 8) {
-          continue;
+        if (player.name !== username){
+          if (player.type === PlayerTypes.thief && numberOfThiefMoves !== 2 && numberOfThiefMoves !== 8) {
+            continue;
+          }
         }
 
         // if the player is me, no matter what, render it
@@ -126,32 +132,44 @@ export const GameBoard = ({navigation}) => {
         offset++;
       }
     }
+
+    // now let's do the cop markers
+    // for (const marker of (game.copMarkers ?? [])){
+    //   ctx.strokeStyle = '#aaaaaa';
+    //   ctx.beginPath();
+    //   ctx.arc(marker.x, marker.y, 20, 0, 2 * Math.PI);
+    //   ctx.stroke();
+    // }
   }
 
   useEffect(() => {
     const subscriber = API.graphql(graphqlOperation(onGameStateChange, {id: game.id})).subscribe({
       next: (data: any) => {
         const game = data.value.data.onGameStateChange;
-        updateGame(game);
+        setGame(game);
       }
     });
     return () => subscriber.unsubscribe()
   }, [game]);
-
-
-
   let fgRef = useRef();
+
+  // const handleBackgroundClick = (args)=>{
+  //   // do locally for now.
+  //   const coords = fgRef.current.screen2GraphCoords(args.x, args.y)
+  //   setGame({...game, copMarkers: [{player: username, ...coords}]})
+  //   console.log(args);
+  // }
+
   return (<View style={pageStyles.container}>
     <GameOverPanel game={game}/>
     <CurrentTurn/>
-    <ThiefMoves thiefMoves={game.thiefMoves}/>
+    <ThiefMoves/>
     <ForceGraph2D
       ref={fgRef}
       backgroundColor="#000000"
       linkWidth={3}
       enableNodeDrag={false}
-      cooldownTicks={10}
-      onEngineStop={() => fgRef.current?.zoomToFit(100)}
+      cooldownTicks={0}
       onNodeClick={handleNodeClick}
       nodeCanvasObject={getCanvasObject}
       linkColor={drawLink}

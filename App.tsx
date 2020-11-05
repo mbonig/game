@@ -38,7 +38,8 @@ let defaultValue: GameState = {
   },
   players: [],
   map: {nodes: [], links: []},
-  thiefMoves: []
+  thiefMoves: [],
+  copMarkers: []
 };
 export const Game = React.createContext({
   game: defaultValue,
@@ -101,26 +102,6 @@ export default function App() {
   const [game, setGame] = useState(initialState);
   const [username, setUsername] = useState("");
 
-  const updateGame = (newGame) => {
-    setGame(newGame);
-  };
-
-  // useEffect(() => {
-  //   const subscriber = API.graphql(graphqlOperation(onGameStateChange, {id: game.id})).subscribe({
-  //     next: data => {
-  //       const game = data.value.data.onGameStateChange;
-  //       setGame(game);
-  //     }
-  //   });
-  //   return () => subscriber.unsubscribe()
-  // }, [game]);
-
-  const setNodePosition = (node: MapNode) => {
-    const theNode = game.map.nodes.find((n) => n.id === node.id);
-    theNode.x = node.x;
-    theNode.y = node.y;
-    // setGame(game);
-  };
 
   const movePlayer = (targetNode: MapNode) => {
     API.graphql(graphqlOperation(makeMove, {id: game.id, myself: username, targetNodeId: targetNode.id}));
@@ -137,7 +118,7 @@ export default function App() {
 
   return (
     <User.Provider value={{username, setUsername}}>
-      <Game.Provider value={{game, movePlayer, setGame, updateGame: updateGame, setNodePosition}}>
+      <Game.Provider value={{game, movePlayer, setGame}}>
         <NavigationContainer>
           <Stack.Navigator detachInactiveScreens={true}>
             <Stack.Screen

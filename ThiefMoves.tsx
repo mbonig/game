@@ -1,12 +1,12 @@
 import React, {useContext} from "react";
-import {Game} from "./App";
 import {FlatList, StyleSheet, Text} from "react-native";
 import {TransportTypes} from "./models";
+import {Game} from "./App";
 
-const ThiefMoveItem = (item: any) => {
+const ThiefMoveItem = ({item}) => {
   let itemStyle;
   let moveType;
-  switch (item.item as TransportTypes) {
+  switch (item.type as TransportTypes) {
     case TransportTypes.slow:
       itemStyle = thiefMovesStyles.slow;
       moveType = 'S';
@@ -22,11 +22,12 @@ const ThiefMoveItem = (item: any) => {
   }
   return (<Text style={[thiefMovesStyles.item, itemStyle]}>{moveType}</Text>);
 }
-export const ThiefMoves = ({thiefMoves}) => {
+export const ThiefMoves = () => {
+  const {game} = useContext(Game);
   return (<FlatList
     horizontal={true}
     style={thiefMovesStyles.container}
-    data={thiefMoves}
+    data={game.thiefMoves}
     renderItem={ThiefMoveItem}
     keyExtractor={(item, index) => index.toString()}/>);
 }

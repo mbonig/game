@@ -40,6 +40,7 @@ export interface GameState {
     links: MapLink[];
     nodes: MapNode[];
   };
+  copMarkers: any[];
 
 }
 

@@ -11,7 +11,10 @@ export const onGameStateChange = /* GraphQL */ `
         status
         winner
       }
-      thiefMoves
+      thiefMoves {
+        type
+        nodeId
+      }
       players {
         name
         type
