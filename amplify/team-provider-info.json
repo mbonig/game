@@ -1,20 +1,26 @@
 {
-  "dev": {
-    "awscloudformation": {
-      "AuthRoleName": "amplify-ethrwars-dev-140615-authRole",
-      "UnauthRoleArn": "arn:aws:iam::536309290949:role/amplify-ethrwars-dev-140615-unauthRole",
-      "AuthRoleArn": "arn:aws:iam::536309290949:role/amplify-ethrwars-dev-140615-authRole",
-      "Region": "us-east-1",
-      "DeploymentBucketName": "amplify-ethrwars-dev-140615-deployment",
-      "UnauthRoleName": "amplify-ethrwars-dev-140615-unauthRole",
-      "StackName": "amplify-ethrwars-dev-140615",
-      "StackId": "arn:aws:cloudformation:us-east-1:536309290949:stack/amplify-ethrwars-dev-140615/b580e960-17c6-11eb-a7dd-0a6a26cca077",
-      "AmplifyAppId": "d2h25ekztjlx10"
-    },
-    "categories": {
-      "auth": {
-        "ethrwars76625525": {}
-      }
+    "dev": {
+        "awscloudformation": {
+            "AuthRoleName": "amplify-ethrwars-dev-140615-authRole",
+            "UnauthRoleArn": "arn:aws:iam::536309290949:role/amplify-ethrwars-dev-140615-unauthRole",
+            "AuthRoleArn": "arn:aws:iam::536309290949:role/amplify-ethrwars-dev-140615-authRole",
+            "Region": "us-east-1",
+            "DeploymentBucketName": "amplify-ethrwars-dev-140615-deployment",
+            "UnauthRoleName": "amplify-ethrwars-dev-140615-unauthRole",
+            "StackName": "amplify-ethrwars-dev-140615",
+            "StackId": "arn:aws:cloudformation:us-east-1:536309290949:stack/amplify-ethrwars-dev-140615/b580e960-17c6-11eb-a7dd-0a6a26cca077",
+            "AmplifyAppId": "d2h25ekztjlx10"
+        },
+        "categories": {
+            "auth": {
+                "ethrwars76625525": {}
+            },
+            "hosting": {
+                "amplifyhosting": {
+                    "appId": "d2h25ekztjlx10",
+                    "type": "cicd"
+                }
+            }
+        }
     }
-  }
 }

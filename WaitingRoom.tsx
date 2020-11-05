@@ -17,18 +17,18 @@ const PlayerItem = ({item}) => {
 export function WaitingRoom({navigation}) {
   const {game, setGame}: { game: GameState, [key: string]: any } = useContext(Game);
 
-  // useEffect(() => {
-  //   const subscriber = API.graphql(graphqlOperation(onGameStateChange, {id: game.id})).subscribe({
-  //     next: data => {
-  //       const game = data.value.data.onGameStateChange;
-  //       setGame(game);
-  //       if (game.status === "Started") {
-  //         navigation.navigate("Game");
-  //       }
-  //     }
-  //   });
-  //   return () => subscriber.unsubscribe()
-  // }, [game]);
+  useEffect(() => {
+    const subscriber = API.graphql(graphqlOperation(onGameStateChange, {id: game.id})).subscribe({
+      next: data => {
+        const game = data.value.data.onGameStateChange;
+        setGame(game);
+        if (game.status === "Started") {
+          navigation.navigate("Game");
+        }
+      }
+    });
+    return () => subscriber.unsubscribe()
+  }, [game]);
 
   if (game.status === "Started") {
     navigation.navigate("Game");
