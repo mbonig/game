@@ -18,7 +18,7 @@ export interface Player {
 }
 
 export interface MapNode extends NodeObject {
-  id: string;
+  id: String;
   x: number;
   y: number;
   type: TransportTypes[];
@@ -46,6 +46,6 @@ export interface GameState {
 
 
 export interface MapLink extends LinkObject {
-  source: MapNode,
-  target: MapNode
+  source: String;
+  target: String;
 }

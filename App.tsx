@@ -16,6 +16,7 @@ import {WaitingRoom} from "./WaitingRoom";
 import {JoinGame} from "./JoinGame";
 import {makeMove} from "./queries";
 import {FindGame} from "./FindGame";
+import {TestScreen} from "./TestScreen";
 
 Amplify.configure(config)
 const Stack = createStackNavigator();
@@ -100,7 +101,7 @@ const initialState = {
 
 export default function App() {
   const [game, setGame] = useState(initialState);
-  const [username, setUsername] = useState("");
+  const [username, setUsername] = useState("Matt");
 
 
   const movePlayer = (targetNode: MapNode) => {
@@ -143,6 +144,10 @@ export default function App() {
                 },
               }}
             />
+            <Stack.Screen
+              name="Test"
+              component={TestScreen}
+              />
           </Stack.Navigator>
         </NavigationContainer>
       </Game.Provider>

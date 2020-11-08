@@ -17,11 +17,12 @@ export const FindGame = ({navigation}) => {
   const joinGame = async (game) => {
     const {data} = await API.graphql(graphqlOperation(joinGameQuery, {id: game.id, myself: username}));
     setGame(data.joinGame);
-    navigation.navigate("Waiting Room");
+    navigation.navigate("Test");
   }
 
   const GameItem = ({item: game}) => {
     return <Text
+      style={{fontSize: 20}}
       onPress={() => joinGame(game)}>{game.id} - {game.players.length} player{game.players.length > 1 ? 's' : ''}</Text>
   }
 

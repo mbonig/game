@@ -22,6 +22,7 @@ const ThiefMoveItem = ({item}) => {
   }
   return (<Text style={[thiefMovesStyles.item, itemStyle]}>{moveType}</Text>);
 }
+
 export const ThiefMoves = () => {
   const {game} = useContext(Game);
   return (<FlatList
@@ -40,9 +41,8 @@ export const FAST_COLOR = '#8519ac';
 
 const thiefMovesStyles = StyleSheet.create({
   container: {
-    flex: 1,
     flexDirection: 'row',
-    backgroundColor: '#111111'
+    backgroundColor: '#111111',
   },
   item: {
     padding: 10,

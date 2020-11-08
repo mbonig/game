@@ -35,10 +35,6 @@ export const waitingRoom = /* GraphQL */ `
           fy
           x
           y
-          players {
-            name
-            type
-          }
         }
       }
     }

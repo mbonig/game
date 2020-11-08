@@ -42,11 +42,12 @@ export const GameOverPanel = ({game}: { game: GameState }) => {
 const currentTurnStyles = StyleSheet.create({
   container: {
     backgroundColor: '#000000',
-    color: '#aaaaaa'
+    color: '#aaaaaa',
+    fontSize: 30
   }
 });
 
-const CurrentTurn = () => {
+export const CurrentTurn = () => {
   const {game} = useContext(Game);
   const {username} = useContext(User);
   const prompt = game.currentTurn.name === username ? 'Your turn!' : `${game.currentTurn.name}'s turn`

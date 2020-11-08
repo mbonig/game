@@ -23,6 +23,7 @@ export const HomeScreen = ({navigation}) => {
             <SimpleButton text="New Game" onPress={() => navigation.navigate('New Game')}/>
             <SimpleButton text="Join Game" onPress={() => navigation.navigate('Join Game')}/>
             <SimpleButton text="Find Game" onPress={() => navigation.navigate('Find Game')}/>
+            <SimpleButton text="Test" onPress={() => navigation.navigate('Test')}/>
           </View>
         )}
     </View>
