@@ -98,7 +98,7 @@ const initialState = {
 
 export default function App() {
   const [game, setGame] = useState(initialState);
-  const [username, setUsername] = useState("Matt");
+  const [username, setUsername] = useState("");
 
 
   const movePlayer = (targetNode: MapNode) => {
