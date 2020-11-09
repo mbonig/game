@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useState} from "react";
+import React, {useContext, useEffect} from "react";
 import {GraphView} from 'react-digraph';
 import {StyleSheet, View} from "react-native";
 import {FAST_COLOR, MEDIUM_COLOR, SLOW_COLOR} from "./styles";
@@ -6,8 +6,8 @@ import {Game, getFastestTravel} from "./App";
 import {API, graphqlOperation} from "aws-amplify";
 import {onGameStateChange} from "./queries";
 import {MapNode} from "./models";
-import {CurrentTurn} from "./GameBoard";
-import {ThiefMoves} from "./ThiefMoves";
+import {CurrentTurn} from './GameBoard';
+import {ThiefMoves} from './ThiefMoves';
 
 const GraphConfig = {
   NodeTypes: {
@@ -15,8 +15,8 @@ const GraphConfig = {
       typeText: "Slow",
       shapeId: "#slow", // relates to the type property of a node
       shape: (
-        <symbol viewBox="0 0 88 72" id="1_slow" width="88" height="88" fill={SLOW_COLOR}>
-          <path d="M 0 36 18 0 70 0 88 36 70 72 18 72Z"/>
+        <symbol viewBox="0 0 80 80" id="1_slow" width="80" height="80" fill={SLOW_COLOR}>
+          <circle r={10} cx={40} cy={40}/>
         </symbol>
       )
     },
@@ -24,8 +24,8 @@ const GraphConfig = {
       typeText: "Medium",
       shapeId: "#medium", // relates to the type property of a node
       shape: (
-        <symbol viewBox="-27 0 154 154" id="2_medium" width="154" height="154" fill={MEDIUM_COLOR}>
-          <rect transform="translate(50) rotate(45)" width="109" height="109"/>
+        <symbol viewBox="0 0 80 80" id="2_medium" width="80" height="80" fill={MEDIUM_COLOR}>
+          <circle r={15} cx={40} cy={40}/>
         </symbol>
       )
     },
@@ -33,8 +33,8 @@ const GraphConfig = {
       typeText: "Fast",
       shapeId: "#fast", // relates to the type property of a node
       shape: (
-        <symbol viewBox="0 0 154 154" width="154" height="154" id="3_fast" fill={FAST_COLOR}>
-          <circle cx="77" cy="77" r="76"/>
+        <symbol viewBox="0 0 100 100" width="100" height="100" id="3_fast" fill={FAST_COLOR}>
+          <circle cx="50" cy="50" r="25"/>
         </symbol>
       )
     }
@@ -44,16 +44,16 @@ const GraphConfig = {
     "edge_slow": {
       shapeId: "#edge_slow",
       shape: (
-        <symbol viewBox="0 0 88 72" id="edge_slow" width="88" height="88" fill={SLOW_COLOR}>
-          <path d="M 0 36 18 0 70 0 88 36 70 72 18 72Z"/>
+        <symbol viewBox="0 0 80 80" width="80" height="80" fill={SLOW_COLOR} id="edge_slow">
+          <circle r={10} cx={40} cy={40}/>
         </symbol>
       )
     },
     "edge_medium": {
       shapeId: "#edge_medium",
       shape: (
-        <symbol viewBox="-27 0 154 154" id="edge_medium" width="154" height="154" fill={MEDIUM_COLOR}>
-          <rect transform="translate(50) rotate(45)" width="109" height="109"/>
+        <symbol viewBox="0 0 80 80" width="80" height="80" fill={MEDIUM_COLOR} id="edge_medium">
+          <circle r={15} cx={40} cy={40}/>
         </symbol>
       )
     },
@@ -61,8 +61,8 @@ const GraphConfig = {
       typeText: "Fast",
       shapeId: "#edge_fast", // relates to the type property of a node
       shape: (
-        <symbol viewBox="0 0 154 154" width="154" height="154" id="edge_fast" fill={FAST_COLOR}>
-          <circle cx="77" cy="77" r="76"/>
+        <symbol viewBox="0 0 100 100" width="100" height="100" fill={FAST_COLOR} id="edge_fast">
+          <circle cx="50" cy="50" r="25"/>
         </symbol>
       )
     },
@@ -82,10 +82,18 @@ const NODE_KEY = "id"
 const graph = StyleSheet.create({
   container: {
     height: '100%'
-  }
-})
+  },
 
-export function TestScreen() {
+  nodeText: {
+    fontFamily: 'sans-serif',
+    fontSize: 26,
+    fill: 'white',
+    fontWeight: "bold"
+  }
+});
+
+
+export function GameScreen() {
   const {game, movePlayer, setGame} = useContext(Game);
 
   const handleNodeClick = (node) => {
@@ -125,17 +133,40 @@ export function TestScreen() {
 
   const renderNode = (nodeRef, node: MapNode, id, selected, hovered) => {
     return (
-      node.type.map(t => <use
-        key={t}
-        x={-100 / 2}
-        y={-100 / 2}
-        width={100}
-        height={100}
-        xlinkHref={'#' + t}
-      />)
+      node.type.sort().reverse().map(t => (
+          <g className="node"
+             key={t}
+             x={-100 / 2}
+             y={-100 / 2}
+             width={100}
+             height={100}>
+            <use
+              x={-100 / 2}
+              y={-100 / 2}
+              width={100}
+              height={100}
+              xlinkHref={'#' + t}
+            />
+          </g>
+        )
+      )
     );
   };
-  let renderNodeText = (data, id) => <text textAnchor="middle">{data.players.map(x => x.name).join(',')}</text>;
+  const renderNodeText = (data: MapNode) => <text y={40}
+                                                  style={{
+                                                    fontFamily: 'sans-serif',
+                                                    fontSize: 26,
+                                                    fill: 'white',
+                                                    fontWeight: "bold"
+                                                  }}
+                                                  textAnchor="middle">{data.players.map(x => x.name).join(',')}</text>;
+
+  const afterRenderEdge = (id, element, edge, edgeContainer, isEdgeSelected) => {
+    console.log(element, edge);
+    const edge1 = edgeContainer.querySelector('.edge');
+    edge1.style.stroke = "#aaaaaa";
+  };
+
   return (
     <View style={graph.container}>
       <svg viewBox="0 0 0 0" style={{height: 0}}>
@@ -156,6 +187,7 @@ export function TestScreen() {
         renderNodeText={renderNodeText}
         renderNode={renderNode}
         onSelectNode={handleNodeClick}
+        afterRenderEdge={afterRenderEdge}
         backgroundFillId="#fill"
         readOnly={true}
       />

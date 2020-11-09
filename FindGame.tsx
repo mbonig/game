@@ -17,7 +17,7 @@ export const FindGame = ({navigation}) => {
   const joinGame = async (game) => {
     const {data} = await API.graphql(graphqlOperation(joinGameQuery, {id: game.id, myself: username}));
     setGame(data.joinGame);
-    navigation.navigate("Test");
+    navigation.navigate("Waiting Room");
   }
 
   const GameItem = ({item: game}) => {

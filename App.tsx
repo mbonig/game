@@ -1,22 +1,19 @@
 import 'react-native-gesture-handler';
 import React, {useState} from 'react';
-import {View} from 'react-native';
 import {LinkObject} from "react-force-graph-2d";
-import {GameBoard} from "./GameBoard";
 
 import Amplify, {API, graphqlOperation} from 'aws-amplify'
 import config from './aws-exports'
 import {NavigationContainer} from "@react-navigation/native";
 import {createStackNavigator} from "@react-navigation/stack";
 import {NewGame} from "./NewGame";
-import {styles} from "./styles";
 import {GameState, MapNode, PlayerTypes, TransportTypes} from "./models";
 import {HomeScreen} from "./Home";
 import {WaitingRoom} from "./WaitingRoom";
 import {JoinGame} from "./JoinGame";
 import {makeMove} from "./queries";
 import {FindGame} from "./FindGame";
-import {TestScreen} from "./TestScreen";
+import {GameScreen} from "./GameScreen";
 
 Amplify.configure(config)
 const Stack = createStackNavigator();
@@ -108,15 +105,6 @@ export default function App() {
     API.graphql(graphqlOperation(makeMove, {id: game.id, myself: username, targetNodeId: targetNode.id}));
   };
 
-
-  const GameScreen = () => (
-    <View style={styles.container}>
-      <GameBoard>
-      </GameBoard>
-    </View>
-  );
-
-
   return (
     <User.Provider value={{username, setUsername}}>
       <Game.Provider value={{game, movePlayer, setGame}}>
@@ -139,15 +127,12 @@ export default function App() {
                 },
                 headerTintColor: '#aaaaaa',
                 headerTitleStyle: {
+                  fontSize: 12,
                   fontWeight: 'bold',
-                  color: '#aaaaaa'
-                },
+                  color: '#aaaaaa',
+                }
               }}
             />
-            <Stack.Screen
-              name="Test"
-              component={TestScreen}
-              />
           </Stack.Navigator>
         </NavigationContainer>
       </Game.Provider>
