@@ -28,7 +28,9 @@ export const User = React.createContext({
   username: "", setUsername: (username) => {
   }
 });
-let defaultValue: GameState = {
+
+export const EMPTY_GAME: GameState = {
+  id: '',
   currentTurn: {name: ''},
   gameStatus: {
     status: '',
@@ -40,7 +42,7 @@ let defaultValue: GameState = {
   copMarkers: []
 };
 export const Game = React.createContext({
-  game: defaultValue,
+  game: EMPTY_GAME,
   movePlayer: (targetNode: MapNode) => {
   },
   setGame: (game: GameState) => {
@@ -98,7 +100,7 @@ const initialState = {
 
 export default function App() {
   const [game, setGame] = useState(initialState);
-  const [username, setUsername] = useState("");
+  const [username, setUsername] = useState("Matt");
 
 
   const movePlayer = (targetNode: MapNode) => {
@@ -113,6 +115,9 @@ export default function App() {
             <Stack.Screen
               name="Home"
               component={HomeScreen}
+              options={{
+                headerShown: false,
+              }}
             />
             <Stack.Screen name="New Game" component={NewGame}/>
             <Stack.Screen name="Waiting Room" component={WaitingRoom}/>
@@ -122,6 +127,7 @@ export default function App() {
               name="Game"
               component={GameScreen}
               options={{
+                headerShown: false,
                 headerStyle: {
                   backgroundColor: '#000000'
                 },

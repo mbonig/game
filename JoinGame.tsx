@@ -1,13 +1,14 @@
-import {Button, Text, TextInput, View} from "react-native";
+import {Text, TextInput, View} from "react-native";
 import React, {useContext, useState} from "react";
 import {API, graphqlOperation} from "aws-amplify";
 import {Game, User} from "./App";
 import {styles} from "./styles";
 import {joinGame} from "./queries";
+import {SimpleButton} from "./SimpleButton";
 
 export const JoinGame = ({navigation}) => {
   const {setGame} = useContext(Game);
-  const [gameId, setGameId] = useState("4go6qm");
+  const [gameId, setGameId] = useState("8b15zd");
   const {username} = useContext(User);
 
   async function onJoinGame() {
@@ -18,8 +19,17 @@ export const JoinGame = ({navigation}) => {
 
   return (
     <View style={styles.centered}>
-      <Text>Enter Game Id</Text>
-      <TextInput onChangeText={setGameId} value={gameId}/>
-      <Button title="Join" onPress={onJoinGame}/>
+      <Text style={{fontSize: 20, margin: 20}}>Enter Game Id</Text>
+      <TextInput style={{
+        fontSize: 20,
+        margin: 20,
+        borderColor: '#333333',
+        borderStyle: "solid",
+        borderWidth: 1,
+        borderRadius: 5,
+        padding: 5
+      }}
+                 onChangeText={setGameId} value={gameId}/>
+      <SimpleButton title="Join" onPress={onJoinGame}/>
     </View>);
 };

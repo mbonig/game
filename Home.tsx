@@ -1,7 +1,6 @@
 import React, {useContext, useState} from "react";
-import {Button, Text, View} from "react-native";
+import {Text, TextInput, View} from "react-native";
 import {styles} from "./styles";
-import {Input} from "react-native-elements";
 import {SimpleButton} from "./SimpleButton";
 import {User} from "./App";
 
@@ -14,15 +13,23 @@ export const HomeScreen = ({navigation}) => {
     <View style={styles.centered}>
       {!username ? (
           <View>
-            <Text>Enter your name:</Text>
-            <Input onChangeText={setTempUsername}></Input>
-            <Button title="Save" onPress={() => setUsername(tempUsername)}/>
+            <Text style={{fontSize: 20, textAlign: "center"}}>Enter your name:</Text>
+            <TextInput style={{
+              fontSize: 20,
+              margin: 20,
+              borderColor: '#333333',
+              borderStyle: "solid",
+              borderWidth: 1,
+              borderRadius: 5,
+              padding: 5
+            }} onChangeText={setTempUsername}/>
+            <SimpleButton title="Save" onPress={() => setUsername(tempUsername)}/>
           </View>) :
         (
           <View>
-            <SimpleButton text="New Game" onPress={() => navigation.navigate('New Game')}/>
-            <SimpleButton text="Join Game" onPress={() => navigation.navigate('Join Game')}/>
-            <SimpleButton text="Find Game" onPress={() => navigation.navigate('Find Game')}/>
+            <SimpleButton title="New Game" onPress={() => navigation.navigate('New Game')}/>
+            <SimpleButton title="Join Game" onPress={() => navigation.navigate('Join Game')}/>
+            <SimpleButton title="Find Game" onPress={() => navigation.navigate('Find Game')}/>
           </View>
         )}
     </View>

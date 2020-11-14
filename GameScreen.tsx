@@ -2,39 +2,54 @@ import React, {useContext, useEffect} from "react";
 import {GraphView} from 'react-digraph';
 import {StyleSheet, View} from "react-native";
 import {FAST_COLOR, MEDIUM_COLOR, SLOW_COLOR} from "./styles";
-import {Game, getFastestTravel} from "./App";
+import {Game, getFastestTravel, User} from "./App";
 import {API, graphqlOperation} from "aws-amplify";
 import {onGameStateChange} from "./queries";
-import {MapNode} from "./models";
-import {CurrentTurn} from './GameBoard';
+import {MapNode, PlayerTypes} from "./models";
 import {ThiefMoves} from './ThiefMoves';
+import {GameOver} from "./GameOver";
+import {CurrentTurn} from "./CurrentTurn";
+import {Players} from "./Players";
 
 const GraphConfig = {
   NodeTypes: {
-    slow: {
+    "1_slow": {
       typeText: "Slow",
       shapeId: "#slow", // relates to the type property of a node
       shape: (
-        <symbol viewBox="0 0 80 80" id="1_slow" width="80" height="80" fill={SLOW_COLOR}>
-          <circle r={10} cx={40} cy={40}/>
+        <symbol viewBox="0 0 100 100" id="slow" width="100" height="100" fill={SLOW_COLOR}>
+          <circle r={10} cx={50} cy={50}/>
         </symbol>
       )
     },
-    medium: {
+    "1_slow_2_medium": {
       typeText: "Medium",
-      shapeId: "#medium", // relates to the type property of a node
+      shapeId: "#slow_medium", // relates to the type property of a node
       shape: (
-        <symbol viewBox="0 0 80 80" id="2_medium" width="80" height="80" fill={MEDIUM_COLOR}>
-          <circle r={15} cx={40} cy={40}/>
+        <symbol viewBox="0 0 100 100" id="slow_medium" width="100" height="100">
+          <circle r={20} cx={50} cy={50} fill={MEDIUM_COLOR}/>
+          <circle r={10} cx={50} cy={50} fill={SLOW_COLOR}/>
         </symbol>
       )
     },
-    fast: {
+    "1_slow_2_medium_3_fast": {
       typeText: "Fast",
-      shapeId: "#fast", // relates to the type property of a node
+      shapeId: "#smf", // relates to the type property of a node
       shape: (
-        <symbol viewBox="0 0 100 100" width="100" height="100" id="3_fast" fill={FAST_COLOR}>
-          <circle cx="50" cy="50" r="25"/>
+        <symbol viewBox="0 0 100 100" id="smf" width="100" height="100">
+          <circle r={30} cx={50} cy={50} fill={FAST_COLOR}/>
+          <circle r={20} cx={50} cy={50} fill={MEDIUM_COLOR}/>
+          <circle r={10} cx={50} cy={50} fill={SLOW_COLOR}/>
+        </symbol>
+      )
+    },
+    "1_slow_3_fast": {
+      typeText: "Fast",
+      shapeId: "#sf", // relates to the type property of a node
+      shape: (
+        <symbol viewBox="0 0 100 100" id="sf" width="100" height="100">
+          <circle r={20} cx={50} cy={50} fill={SLOW_COLOR}/>
+          <circle r={10} cx={50} cy={50} fill={FAST_COLOR}/>
         </symbol>
       )
     }
@@ -44,16 +59,16 @@ const GraphConfig = {
     "edge_slow": {
       shapeId: "#edge_slow",
       shape: (
-        <symbol viewBox="0 0 80 80" width="80" height="80" fill={SLOW_COLOR} id="edge_slow">
-          <circle r={10} cx={40} cy={40}/>
+        <symbol viewBox="0 0 100 100" width="100" height="100" fill={SLOW_COLOR} id="edge_slow">
+          <circle r={10} cx={50} cy={50}/>
         </symbol>
       )
     },
     "edge_medium": {
       shapeId: "#edge_medium",
       shape: (
-        <symbol viewBox="0 0 80 80" width="80" height="80" fill={MEDIUM_COLOR} id="edge_medium">
-          <circle r={15} cx={40} cy={40}/>
+        <symbol viewBox="0 0 100 100" width="100" height="100" fill={MEDIUM_COLOR} id="edge_medium">
+          <circle r={10} cx={50} cy={50}/>
         </symbol>
       )
     },
@@ -62,15 +77,7 @@ const GraphConfig = {
       shapeId: "#edge_fast", // relates to the type property of a node
       shape: (
         <symbol viewBox="0 0 100 100" width="100" height="100" fill={FAST_COLOR} id="edge_fast">
-          <circle cx="50" cy="50" r="25"/>
-        </symbol>
-      )
-    },
-    emptyEdge: {  // required to show empty edges
-      shapeId: "#emptyEdge",
-      shape: (
-        <symbol viewBox="0 0 50 50" id="emptyEdge" key="0">
-
+          <circle r={10} cx={50} cy={50}/>
         </symbol>
       )
     }
@@ -92,10 +99,9 @@ const graph = StyleSheet.create({
   }
 });
 
-
-export function GameScreen() {
+export function GameScreen({navigation}) {
   const {game, movePlayer, setGame} = useContext(Game);
-
+  const {username} = useContext(User);
   const handleNodeClick = (node) => {
     if (!node) {
       return;
@@ -116,53 +122,74 @@ export function GameScreen() {
   const newEdges = game.map.links.map(l => {
     const source = game.map.nodes.find(n => n.id === l.source);
     const target = game.map.nodes.find(n => n.id === l.target);
-    const transportType = getFastestTravel({source, target});
-    const edgeType = "edge_" + transportType.toString().replace(/[0-9]_/i, '')
+    const fastestTravel = getFastestTravel({source, target});
+    const edgeType = "edge_" + fastestTravel.toString().replace(/[0-9]_/i, '')
+    console.log({edgeType});
     return {
       ...l,
       type: edgeType
     }
-  })
+  });
+
+  const getNodeType = (node: MapNode) => node.type.sort().join("_");
 
   const newNodes = game.map.nodes.map(n => {
     n.title = n.players.map(x => x.name).join(', ');
     n.x = n.fx;
     n.y = n.fy;
+    n.type = getNodeType(n);
     return n;
   })
 
   const renderNode = (nodeRef, node: MapNode, id, selected, hovered) => {
+    const children = node.type.sort().reverse().map(t => (<use
+      id={t}
+      key={t}
+      x={-100 / 2}
+      y={-100 / 2}
+      width={100}
+      height={100}
+      xlinkHref={'#' + t}
+    />));
+
     return (
-      node.type.sort().reverse().map(t => (
-          <g className="node"
-             key={t}
-             x={-100 / 2}
-             y={-100 / 2}
-             width={100}
-             height={100}>
-            <use
-              x={-100 / 2}
-              y={-100 / 2}
-              width={100}
-              height={100}
-              xlinkHref={'#' + t}
-            />
-          </g>
-        )
-      )
+      <g className="node"
+         x={-100 / 2}
+         y={-100 / 2}
+         width={100}
+         height={100}>
+        {children}
+      </g>
     );
   };
-  const renderNodeText = (data: MapNode) => <text y={40}
-                                                  style={{
-                                                    fontFamily: 'sans-serif',
-                                                    fontSize: 26,
-                                                    fill: 'white',
-                                                    fontWeight: "bold"
-                                                  }}
-                                                  textAnchor="middle">{data.players.map(x => x.name).join(',')}</text>;
+  const renderNodeText = (data: MapNode) => {
+    let playerNames = data.players.filter(x => x.type === PlayerTypes.cop).map(x => x.name);
+    const addThief = (player) => playerNames.push(`${player.name} (thief)`);
+    const thief = data.players.find(x => x.type === PlayerTypes.thief)!;
+    if (thief) {
+      if (!!game.gameStatus?.status) {
+        addThief(thief);
+      } else {
+        if (thief.name === username) {
+          // always show yourself if you're the thief
+          addThief(thief);
+        } else if ([2, 7, 12, 17].includes(game.thiefMoves.length)) {
+          addThief(thief);
+        }
+      }
+    }
+
+    return <text y={40}
+                 style={{
+                   fontFamily: 'sans-serif',
+                   fontSize: 26,
+                   fill: 'white',
+                   fontWeight: "bold"
+                 }}
+                 textAnchor="middle">{playerNames.join(',')}</text>;
+  };
 
   const afterRenderEdge = (id, element, edge, edgeContainer, isEdgeSelected) => {
-    console.log(element, edge);
     const edge1 = edgeContainer.querySelector('.edge');
     edge1.style.stroke = "#aaaaaa";
   };
@@ -174,8 +201,10 @@ export function GameScreen() {
           <rect width="5" height="5"></rect>
         </pattern>
       </svg>
-      <ThiefMoves/>
+      <GameOver navigation={navigation}/>
       <CurrentTurn/>
+      <ThiefMoves/>
+      <Players/>
       <GraphView
         nodeKey={NODE_KEY}
         nodes={newNodes}
@@ -185,7 +214,7 @@ export function GameScreen() {
         edgeTypes={GraphConfig.EdgeTypes}
         edgeArrowSize={0}
         renderNodeText={renderNodeText}
-        renderNode={renderNode}
+        // renderNode={renderNode}
         onSelectNode={handleNodeClick}
         afterRenderEdge={afterRenderEdge}
         backgroundFillId="#fill"

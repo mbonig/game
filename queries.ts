@@ -68,6 +68,7 @@ export const startGame = /* GraphQL */ `
           id
           fx
           fy
+          type
           players {
             name
             type

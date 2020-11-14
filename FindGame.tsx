@@ -22,7 +22,7 @@ export const FindGame = ({navigation}) => {
 
   const GameItem = ({item: game}) => {
     return <Text
-      style={{fontSize: 20}}
+      style={{fontSize: 20, margin: 10}}
       onPress={() => joinGame(game)}>{game.id} - {game.players.length} player{game.players.length > 1 ? 's' : ''}</Text>
   }
 
@@ -36,6 +36,10 @@ export const FindGame = ({navigation}) => {
 
   return (<View style={styles.centered}>
     <FlatList
+      contentContainerStyle={{
+        flex: 1,
+        justifyContent: 'center',
+      }}
       data={games}
       renderItem={GameItem}
       keyExtractor={({id}) => id}

@@ -30,7 +30,7 @@ export const NewGame = ({navigation}) => {
 
   return (
     <View style={styles.centered}>
-      <Text>{!game ? 'Creating Game...' : 'Game Created!'}</Text>
+      <Text style={{fontSize: 20}}>{!game ? 'Creating Game...' : 'Game Created!'}</Text>
     </View>
   );
 };

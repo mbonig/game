@@ -122,6 +122,7 @@ exports.handler = async (event) => {
       thiefMoves: []
     };
     await ddb.put({TableName: TABLE, Item: newGame}).promise();
+    return newGame;
   }
 
   return game;
