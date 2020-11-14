@@ -5,11 +5,11 @@ import {FAST_COLOR, MEDIUM_COLOR, SLOW_COLOR} from "./styles";
 import {Game, getFastestTravel, User} from "./App";
 import {API, graphqlOperation} from "aws-amplify";
 import {onGameStateChange} from "./queries";
-import {MapNode, PlayerTypes} from "./models";
+import {MapNode, Player, PlayerTypes} from "./models";
 import {ThiefMoves} from './ThiefMoves';
 import {GameOver} from "./GameOver";
 import {CurrentTurn} from "./CurrentTurn";
-import {Players} from "./Players";
+import {PlayerColors, Players} from "./Players";
 
 const GraphConfig = {
   NodeTypes: {
@@ -18,7 +18,7 @@ const GraphConfig = {
       shapeId: "#slow", // relates to the type property of a node
       shape: (
         <symbol viewBox="0 0 100 100" id="slow" width="100" height="100" fill={SLOW_COLOR}>
-          <circle r={10} cx={50} cy={50}/>
+          <circle r={20} cx={50} cy={50}/>
         </symbol>
       )
     },
@@ -124,7 +124,7 @@ export function GameScreen({navigation}) {
     const target = game.map.nodes.find(n => n.id === l.target);
     const fastestTravel = getFastestTravel({source, target});
     const edgeType = "edge_" + fastestTravel.toString().replace(/[0-9]_/i, '')
-    console.log({edgeType});
+
     return {
       ...l,
       type: edgeType
@@ -133,7 +133,7 @@ export function GameScreen({navigation}) {
 
   const getNodeType = (node: MapNode) => node.type.sort().join("_");
 
-  const newNodes = game.map.nodes.map(n => {
+  const newNodes = game.map.nodes.map((n: any) => {
     n.title = n.players.map(x => x.name).join(', ');
     n.x = n.fx;
     n.y = n.fy;
@@ -141,52 +141,44 @@ export function GameScreen({navigation}) {
     return n;
   })
 
-  const renderNode = (nodeRef, node: MapNode, id, selected, hovered) => {
-    const children = node.type.sort().reverse().map(t => (<use
-      id={t}
-      key={t}
-      x={-100 / 2}
-      y={-100 / 2}
-      width={100}
-      height={100}
-      xlinkHref={'#' + t}
-    />));
-
-    return (
-      <g className="node"
-         x={-100 / 2}
-         y={-100 / 2}
-         width={100}
-         height={100}>
-        {children}
-      </g>
-    );
-  };
   const renderNodeText = (data: MapNode) => {
-    let playerNames = data.players.filter(x => x.type === PlayerTypes.cop).map(x => x.name);
-    const addThief = (player) => playerNames.push(`${player.name} (thief)`);
+    const players = data.players;
     const thief = data.players.find(x => x.type === PlayerTypes.thief)!;
+
+    let showThief = false;
     if (thief) {
       if (!!game.gameStatus?.status) {
-        addThief(thief);
+        showThief = true;
       } else {
         if (thief.name === username) {
           // always show yourself if you're the thief
-          addThief(thief);
+          showThief = true;
         } else if ([2, 7, 12, 17].includes(game.thiefMoves.length)) {
-          addThief(thief);
+          showThief = true;
         }
       }
     }
 
-    return <text y={40}
-                 style={{
-                   fontFamily: 'sans-serif',
-                   fontSize: 26,
-                   fill: 'white',
-                   fontWeight: "bold"
-                 }}
-                 textAnchor="middle">{playerNames.join(',')}</text>;
+    let offset = -1;
+    return players.map(player => {
+      offset++;
+      if (player.type === PlayerTypes.thief && !showThief) {
+        return;
+      }
+      const playerIndex = game.players.findIndex((x: Player) => x.name === player.name);
+      const color = PlayerColors[playerIndex];
+
+      return (<text
+        key={player.name}
+        y={40 + (offset * 30)}
+        style={{
+          fontFamily: 'sans-serif',
+          fontSize: 26,
+          fill: color,
+          fontWeight: "bold",
+        }}
+        textAnchor="middle">{player.name}</text>);
+    });
   };
 
   const afterRenderEdge = (id, element, edge, edgeContainer, isEdgeSelected) => {
