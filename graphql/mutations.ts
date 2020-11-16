@@ -18,10 +18,22 @@ export const createGame = /* GraphQL */ `
       players {
         name
         type
+        tickets {
+          slow
+          medium
+          fast
+          black
+        }
       }
       currentTurn {
         name
         type
+        tickets {
+          slow
+          medium
+          fast
+          black
+        }
       }
       map {
         links {
@@ -30,9 +42,7 @@ export const createGame = /* GraphQL */ `
         }
         nodes {
           id
-          type
-          fx
-          fy
+          types
           x
           y
         }
@@ -56,10 +66,22 @@ export const startGame = /* GraphQL */ `
       players {
         name
         type
+        tickets {
+          slow
+          medium
+          fast
+          black
+        }
       }
       currentTurn {
         name
         type
+        tickets {
+          slow
+          medium
+          fast
+          black
+        }
       }
       map {
         links {
@@ -68,9 +90,7 @@ export const startGame = /* GraphQL */ `
         }
         nodes {
           id
-          type
-          fx
-          fy
+          types
           x
           y
         }
@@ -94,10 +114,22 @@ export const joinGame = /* GraphQL */ `
       players {
         name
         type
+        tickets {
+          slow
+          medium
+          fast
+          black
+        }
       }
       currentTurn {
         name
         type
+        tickets {
+          slow
+          medium
+          fast
+          black
+        }
       }
       map {
         links {
@@ -106,9 +138,7 @@ export const joinGame = /* GraphQL */ `
         }
         nodes {
           id
-          type
-          fx
-          fy
+          types
           x
           y
         }
@@ -117,8 +147,18 @@ export const joinGame = /* GraphQL */ `
   }
 `;
 export const makeMove = /* GraphQL */ `
-  mutation MakeMove($id: ID!, $myself: String!, $targetNodeId: Int!) {
-    makeMove(id: $id, myself: $myself, targetNodeId: $targetNodeId) {
+  mutation MakeMove(
+    $id: ID!
+    $myself: String!
+    $targetNodeId: Int!
+    $ticket: String
+  ) {
+    makeMove(
+      id: $id
+      myself: $myself
+      targetNodeId: $targetNodeId
+      ticket: $ticket
+    ) {
       id
       status
       gameStatus {
@@ -132,10 +172,22 @@ export const makeMove = /* GraphQL */ `
       players {
         name
         type
+        tickets {
+          slow
+          medium
+          fast
+          black
+        }
       }
       currentTurn {
         name
         type
+        tickets {
+          slow
+          medium
+          fast
+          black
+        }
       }
       map {
         links {
@@ -144,9 +196,7 @@ export const makeMove = /* GraphQL */ `
         }
         nodes {
           id
-          type
-          fx
-          fy
+          types
           x
           y
         }

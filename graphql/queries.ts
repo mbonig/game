@@ -18,10 +18,22 @@ export const waitingRoom = /* GraphQL */ `
       players {
         name
         type
+        tickets {
+          slow
+          medium
+          fast
+          black
+        }
       }
       currentTurn {
         name
         type
+        tickets {
+          slow
+          medium
+          fast
+          black
+        }
       }
       map {
         links {
@@ -30,9 +42,7 @@ export const waitingRoom = /* GraphQL */ `
         }
         nodes {
           id
-          type
-          fx
-          fy
+          types
           x
           y
         }

@@ -49,7 +49,7 @@ export function WaitingRoom({navigation}) {
         renderItem={PlayerItem}
         keyExtractor={({name}) => name}
       />
-      <SimpleButton text="Start" onPress={onStartPress}></SimpleButton>
+      <SimpleButton title="Start" onPress={onStartPress}/>
     </View>
   );
 }

@@ -34,48 +34,48 @@ function generateMap() {
     nodes: [
       {
         id: 1,
-        type: [TransportTypes.slow, TransportTypes.medium, TransportTypes.fast],
-        fx: 557,
-        fy: -69
+        types: [TransportTypes.slow, TransportTypes.medium, TransportTypes.fast],
+        x: 557,
+        y: -69
       },
-      {id: 2, type: [TransportTypes.slow], fx: 276, fy: -59},
-      {id: 3, type: [TransportTypes.medium, TransportTypes.slow], fx: 582, fy: 214},
-      {id: 4, type: [TransportTypes.fast, TransportTypes.slow], fx: 56, fy: 18},
+      {id: 2, types: [TransportTypes.slow], x: 276, y: -59},
+      {id: 3, types: [TransportTypes.medium, TransportTypes.slow], x: 582, y: 214},
+      {id: 4, types: [TransportTypes.fast, TransportTypes.slow], x: 56, y: 18},
       {
         id: 5,
-        type: [TransportTypes.fast, TransportTypes.medium, TransportTypes.slow],
+        types: [TransportTypes.fast, TransportTypes.medium, TransportTypes.slow],
         players: [],
-        fx: 42,
-        fy: 263
+        x: 42,
+        y: 263
       },
       {
         id: 6,
-        type: [TransportTypes.medium, TransportTypes.slow],
+        types: [TransportTypes.medium, TransportTypes.slow],
         players: [],
-        fx: -110,
-        fy: 342
+        x: -110,
+        y: 342
       },
       {
         id: 7,
-        type: [TransportTypes.fast, TransportTypes.slow],
+        types: [TransportTypes.fast, TransportTypes.slow],
         players: [],
-        fx: 276,
-        fy: 203
+        x: 276,
+        y: 203
       },
       {
         id: 8,
-        type: [TransportTypes.medium, TransportTypes.slow],
+        types: [TransportTypes.medium, TransportTypes.slow],
         players: [],
-        fx: -189,
-        fy: -93
+        x: -189,
+        y: -93
       },
-      {id: 9, type: [TransportTypes.slow], players: [], fx: 98, fy: 480},
+      {id: 9, types: [TransportTypes.slow], players: [], x: 98, y: 480},
       {
         id: 10,
-        type: [TransportTypes.medium, TransportTypes.slow],
+        types: [TransportTypes.medium, TransportTypes.slow],
         players: [],
-        fx: 387,
-        fy: 478
+        x: 387,
+        y: 478
       },
     ],
     links: [
@@ -109,9 +109,10 @@ exports.handler = async (event) => {
     return game;
   }
 
-  const players = game.players.map(x => ({...x, type: 'cop'}));
+  const players = game.players.map(x => ({...x, type: 'cop', tickets: {slow: 5, medium: 3, fast: 1}}));
   const thief = players[~~(Math.random() * players.length)];
   thief.type = "thief";
+  thief.tickets.black = 2;
   if (game.status === 'Waiting') {
     let newGame = {
       ...game,

@@ -18,8 +18,8 @@ const buttonStyles = StyleSheet.create({
   }
 });
 
-export const SimpleButton = ({title, onPress}) => (
-  <TouchableOpacity style={buttonStyles.button} onPress={onPress}>
+export const SimpleButton = ({title, onPress, disabled}) => (
+  <TouchableOpacity style={buttonStyles.button} onPress={onPress} disabled={disabled}>
     <Text style={buttonStyles.text}>{title}</Text>
   </TouchableOpacity>
 );

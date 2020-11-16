@@ -39,18 +39,19 @@ export const EMPTY_GAME: GameState = {
   players: [],
   map: {nodes: [], links: []},
   thiefMoves: [],
-  copMarkers: []
+  copMarkers: [],
 };
 export const Game = React.createContext({
   game: EMPTY_GAME,
-  movePlayer: (targetNode: MapNode) => {
+  movePlayer: (targetNode: MapNode, ticket: String) => {
   },
   setGame: (game: GameState) => {
   },
   updateGame: (game: GameState) => {
   },
   setNodePosition: (node: MapNode) => {
-  }
+  },
+  setHighlightedNode: (node: MapNode)=> {}
 });
 
 
@@ -94,22 +95,31 @@ const initialState = {
   players: players,
   currentTurn: players[0],
   turnsLeft: 0,
-  thiefMoves: []
+  thiefMoves: [],
+  highlightedNode: {}
 };
 
 
 export default function App() {
   const [game, setGame] = useState(initialState);
-  const [username, setUsername] = useState("Matt");
+  const [username, setUsername] = useState("");
 
 
-  const movePlayer = (targetNode: MapNode) => {
-    API.graphql(graphqlOperation(makeMove, {id: game.id, myself: username, targetNodeId: targetNode.id}));
+  const movePlayer = (targetNode: MapNode, ticket: string) => {
+    API.graphql(graphqlOperation(makeMove, {id: game.id, myself: username, targetNodeId: targetNode.id, ticket}));
   };
+
+  const setHighlightedNode = (node: MapNode)=> {
+    setGame({
+      ...game,
+      highlightedNode: node
+    })
+  };
+
 
   return (
     <User.Provider value={{username, setUsername}}>
-      <Game.Provider value={{game, movePlayer, setGame}}>
+      <Game.Provider value={{game, movePlayer, setGame, setHighlightedNode}}>
         <NavigationContainer>
           <Stack.Navigator detachInactiveScreens={true}>
             <Stack.Screen
@@ -149,7 +159,7 @@ export default function App() {
 
 
 export function getFastestTravel(node: LinkObject) {
-  const {source: {type: st}, target: {type: tt}} = node;
+  const {source: {types: st}, target: {types: tt}} = node;
   let a = new Set(st);
   let b = new Set(tt);
   let intersection = new Set([...a].filter(x => b.has(x)));

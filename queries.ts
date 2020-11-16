@@ -14,6 +14,12 @@ export const onGameStateChange = /* GraphQL */ `
       players {
         name
         type
+        tickets {
+          slow
+          medium
+          fast
+          black
+        }
       }
       currentTurn {
         name
@@ -26,9 +32,9 @@ export const onGameStateChange = /* GraphQL */ `
         }
         nodes {
           id
-          type
-          fx
-          fy
+          types
+          x
+          y
           players {
             name
             type
@@ -54,6 +60,12 @@ export const startGame = /* GraphQL */ `
       players {
         name
         type
+        tickets {
+          slow
+          medium
+          fast
+          black
+        }
       }
       currentTurn {
         name
@@ -66,9 +78,9 @@ export const startGame = /* GraphQL */ `
         }
         nodes {
           id
-          fx
-          fy
-          type
+          x
+          y
+          types
           players {
             name
             type
@@ -79,8 +91,8 @@ export const startGame = /* GraphQL */ `
   }
 `;
 export const makeMove = /* GraphQL */ `
-  mutation MakeMove($id: ID!, $myself: String!, $targetNodeId: Int!) {
-    makeMove(id: $id, myself: $myself, targetNodeId: $targetNodeId) {
+  mutation MakeMove($id: ID!, $myself: String!, $targetNodeId: Int!, $ticket: String) {
+    makeMove(id: $id, myself: $myself, targetNodeId: $targetNodeId, ticket: $ticket) {
       id
       gameStatus {
         status
@@ -93,6 +105,12 @@ export const makeMove = /* GraphQL */ `
       players {
         name
         type
+        tickets {
+          slow
+          medium
+          fast
+          black
+        }
       }
       currentTurn {
         name
@@ -105,9 +123,9 @@ export const makeMove = /* GraphQL */ `
         }
         nodes {
           id
-          type
-          fx
-          fy
+          types
+          x
+          y
           players {
             name
             type
@@ -133,6 +151,12 @@ export const joinGame = /* GraphQL */ `
       players {
         name
         type
+        tickets {
+          slow
+          medium
+          fast
+          black
+        }
       }
       currentTurn {
         name
@@ -145,9 +169,9 @@ export const joinGame = /* GraphQL */ `
         }
         nodes {
           id
-          type
-          fx
-          fy
+          types
+          x
+          y
           players {
             name
             type

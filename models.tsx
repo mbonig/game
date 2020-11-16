@@ -15,6 +15,12 @@ export enum PlayerTypes {
 export interface Player {
   name: string;
   type?: PlayerTypes;
+  tickets: {
+    slow: Number;
+    medium: Number;
+    fast: Number;
+    black: Number;
+  }
 }
 
 export interface MapNode extends NodeObject {
@@ -22,6 +28,7 @@ export interface MapNode extends NodeObject {
   x: number;
   y: number;
   type: TransportTypes[];
+  types: TransportTypes[];
   players: Player[];
 }
 
@@ -41,7 +48,7 @@ export interface GameState {
     nodes: MapNode[];
   };
   copMarkers: any[];
-
+  highlightedNode?: MapNode
 }
 
 

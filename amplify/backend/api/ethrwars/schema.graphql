@@ -10,9 +10,17 @@ type GameStatus {
     winner: String!
 }
 
+type Tickets {
+    slow: Int!
+    medium: Int!
+    fast: Int!
+    black: Int
+}
+
 type Player {
     name: String!
-    type: String
+    type: String,
+    tickets: Tickets
 }
 
 type MapLink {
@@ -23,9 +31,7 @@ type MapLink {
 type MapNode {
     id: Int!
     players: [Player!]
-    type: [String!]
-    fx: Float
-    fy: Float
+    types: [String!]
     x: Float
     y: Float
 }
@@ -59,7 +65,7 @@ type Mutation {
     createGame(myself: String!): Game @function(name: "creategame-${env}")
     startGame(id: ID!): Game @function(name: "startgame-${env}")
     joinGame(id: ID!, myself: String!): Game @function(name: "joingame-${env}")
-    makeMove(id: ID!, myself: String!, targetNodeId: Int!): Game @function(name: "makemove-${env}")
+    makeMove(id: ID!, myself: String!, targetNodeId: Int!, ticket: String): Game @function(name: "makemove-${env}")
 }
 
 type Subscription {

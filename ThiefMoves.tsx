@@ -2,11 +2,12 @@ import React, {useContext} from "react";
 import {FlatList, StyleSheet, Text} from "react-native";
 import {TransportTypes} from "./models";
 import {Game} from "./App";
+import {SHOW_INDEXES} from "./GameScreen";
 
-const ThiefMoveItem = ({item}) => {
+const ThiefMoveItem = (setHighlightedNode) => ({item, index}) => {
   let itemStyle;
   let moveType;
-  switch (item.type as TransportTypes) {
+  switch (item.type) {
     case TransportTypes.slow:
       itemStyle = thiefMovesStyles.slow;
       moveType = 'S';
@@ -19,17 +20,30 @@ const ThiefMoveItem = ({item}) => {
       itemStyle = thiefMovesStyles.fast;
       moveType = 'F';
       break;
+    case "black":
+      itemStyle = thiefMovesStyles.black;
+      moveType = 'B';
+      break;
+
+  }
+
+  const onPress = () => {
+    setHighlightedNode({...item, id: (+item.nodeId)});
+  }
+  if (SHOW_INDEXES.includes(index + 1)) {
+    return (<Text onPress={onPress}
+                  style={[thiefMovesStyles.item, itemStyle, thiefMovesStyles.highlighted]}>{moveType}</Text>);
   }
   return (<Text style={[thiefMovesStyles.item, itemStyle]}>{moveType}</Text>);
 }
 
 export const ThiefMoves = () => {
-  const {game} = useContext(Game);
+  const {game, setHighlightedNode} = useContext(Game);
   return (<FlatList
     horizontal={true}
     style={thiefMovesStyles.container}
     data={game.thiefMoves}
-    renderItem={ThiefMoveItem}
+    renderItem={ThiefMoveItem(setHighlightedNode)}
     keyExtractor={(item, index) => index.toString()}/>);
 }
 
@@ -37,6 +51,7 @@ export const ThiefMoves = () => {
 export const SLOW_COLOR = '#fdf919';
 export const MEDIUM_COLOR = '#009900';
 export const FAST_COLOR = '#8519ac';
+export const BLACK_COLOR = '#ac1919';
 
 
 const thiefMovesStyles = StyleSheet.create({
@@ -58,5 +73,11 @@ const thiefMovesStyles = StyleSheet.create({
   },
   fast: {
     color: FAST_COLOR
+  },
+  black: {
+    color: BLACK_COLOR
+  },
+  highlighted: {
+    backgroundColor: '#777777'
   }
 });

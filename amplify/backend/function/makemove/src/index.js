@@ -2,7 +2,33 @@ const AWS = require('aws-sdk');
 const ddb = new AWS.DynamoDB.DocumentClient();
 const TABLE = process.env.TABLE;
 
-function checkValidMove(targetNode, currentGame) {
+const transportTypeTicketMap = {
+  "1_slow": "slow",
+  "2_medium": "medium",
+  "3_fast": "fast"
+}
+
+function getTicketToUse(targetNode, currentGame, ticket) {
+  const playersCurrentNode = currentGame.map.nodes.find(n => n.players.find(p => p.name === currentGame.currentTurn.name));
+
+  const transportTypes = getAllTravel({source: playersCurrentNode, target: targetNode});
+  const currentPlayer = currentGame.players.find(x => x.name === currentGame.currentTurn.name);
+
+  if (ticket === 'black' && currentPlayer.tickets.black > 0) {
+    return 'black';
+  }
+
+  for (const transportType of transportTypes) {
+    const t = transportTypeTicketMap[transportType]
+
+    if (currentPlayer.tickets[t] > 0) {
+      return t;
+    }
+  }
+  return null;
+}
+
+function checkValidMove(targetNode, currentGame, ticket) {
 
   if (currentGame.gameStatus && currentGame.gameStatus.status) {
     return false;
@@ -10,7 +36,19 @@ function checkValidMove(targetNode, currentGame) {
   const playersCurrentNode = currentGame.map.nodes.find(n => n.players.find(p => p.name === currentGame.currentTurn.name));
   const availableTargetNodes = currentGame.map.links.filter(l => l.source === playersCurrentNode.id || l.target === playersCurrentNode.id)
     .map(l => l.source === playersCurrentNode.id ? l.target : l.source);
+
+  const currentPlayer = currentGame.players.find(x => x.name === currentGame.currentTurn.name);
+  if (ticket === 'black' && currentPlayer.tickets.black > 0) {
+    return true;
+  }
+
   if (availableTargetNodes.find(n => n === targetNode.id)) {
+    // let's also check to make sure the player has a ticket to use
+    const ticketUsed = getTicketToUse(targetNode, currentGame);
+    if (ticketUsed === null) {
+      console.log(`Didn't have a ticket to travel`);
+      return false;
+    }
     return true;
   }
   console.log("Couldn't find the target node in the list of availableTargetNodes", {
@@ -55,27 +93,36 @@ const createCurrentPlayerMapper = (player, targetNode) => (node) => {
 };
 
 function getFastestTravel(node) {
-  const {source: {type: st}, target: {type: tt}} = node;
+  const {source: {types: st}, target: {types: tt}} = node;
   let a = new Set(st);
   let b = new Set(tt);
   let intersection = new Set([...a].filter(x => b.has(x)));
   return [...intersection].sort().reverse()[0];
 }
 
+function getAllTravel(link) {
+  const {source: {types: st}, target: {types: tt}} = link;
+  let a = new Set(st);
+  let b = new Set(tt);
+  let intersection = new Set([...a].filter(x => b.has(x)));
+  return [...intersection].sort().reverse();
+}
+
 
 exports.handler = async (event) => {
   console.log({event});
-  const {arguments: {id, targetNodeId, myself}} = event;
+  const {arguments: {id, targetNodeId, myself, ticket}} = event;
 
   const {Item: currentGame} = await ddb.get({Key: {id}, TableName: TABLE}).promise();
 
   if (currentGame.currentTurn.name !== myself) {
     return currentGame;
   }
+  const me = currentGame.players.find(x => x.name === myself);
 
   const targetNode = currentGame.map.nodes.find(x => x.id === targetNodeId);
 
-  if (!checkValidMove(targetNode, currentGame)) {
+  if (!checkValidMove(targetNode, currentGame, ticket)) {
     console.log("Not a valid move", targetNode, currentGame);
     return currentGame;
   }
@@ -90,14 +137,31 @@ exports.handler = async (event) => {
     currentIndex = -1;
   }
 
-  let currentPlayer = currentGame.currentTurn;
-  let currentMap = currentGame.map;
+  let ticketUsed;
+  if (!ticket) {
+    ticketUsed = getTicketToUse(targetNode, currentGame);
+  } else {
+    if (me.tickets[ticket] > 0) {
+      ticketUsed = ticket;
+    }
+  }
+
+  const newPlayers = currentGame.players.map(p => {
+    if (p.name === currentGame.currentTurn.name) {
+      p.tickets[ticketUsed] = p.tickets[ticketUsed] - 1;
+    }
+    return p;
+  });
+
+  const currentPlayer = currentGame.currentTurn;
+  const currentMap = currentGame.map;
   const thiefMoves = isThief ? [...(currentGame.thiefMoves || []), {
-    type: moveType,
+    type: ticket === 'black' ? 'black' : moveType,
     nodeId: targetNode.id
   }] : currentGame.thiefMoves;
   const newGame = {
     ...currentGame,
+    players: newPlayers,
     currentTurn: currentGame.players[currentIndex + 1],
     map: {
       nodes: currentMap.nodes.map(createCurrentPlayerMapper(currentPlayer, targetNode)),

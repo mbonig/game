@@ -1,4 +1,4 @@
-import React, {useContext, useEffect} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import {GraphView} from 'react-digraph';
 import {StyleSheet, View} from "react-native";
 import {FAST_COLOR, MEDIUM_COLOR, SLOW_COLOR} from "./styles";
@@ -10,6 +10,8 @@ import {ThiefMoves} from './ThiefMoves';
 import {GameOver} from "./GameOver";
 import {CurrentTurn} from "./CurrentTurn";
 import {PlayerColors, Players} from "./Players";
+import {Tickets} from "./Tickets";
+import {TicketPicker} from "./TicketPicker";
 
 const GraphConfig = {
   NodeTypes: {
@@ -54,7 +56,17 @@ const GraphConfig = {
       )
     }
   },
-  NodeSubtypes: {},
+  NodeSubtypes: {
+    highlighted: {
+      typeText: "Thief",
+      shapeId: "#highlight", // relates to the type property of a node
+      shape: (
+        <symbol viewBox="0 0 100 100" id="highlight" width="100" height="100">
+          <circle r={80} cx={50} cy={50} opacity={0.4} fill="#aaaaaa"/>
+        </symbol>
+      )
+    }
+  },
   EdgeTypes: {
     "edge_slow": {
       shapeId: "#edge_slow",
@@ -99,11 +111,26 @@ const graph = StyleSheet.create({
   }
 });
 
+export const SHOW_INDEXES = [2, 7, 12, 17];
+
+
 export function GameScreen({navigation}) {
   const {game, movePlayer, setGame} = useContext(Game);
   const {username} = useContext(User);
+  const [showTicketPicker, setShowTicketPicker] = useState(false);
+  const [selectedNode, setSelectedNode] = useState(null);
   const handleNodeClick = (node) => {
     if (!node) {
+      return;
+    }
+    if (game.currentTurn.name !== username){
+      console.log(`It's not your turn yet...`);
+      return;
+    }
+    if (game.players.find((p:Player)=>p.name === username)!.type === PlayerTypes.thief){
+      // if I'm a thief, display the ticket option window.
+      setSelectedNode(node);
+      setShowTicketPicker(true);
       return;
     }
     movePlayer(node);
@@ -131,14 +158,12 @@ export function GameScreen({navigation}) {
     }
   });
 
-  const getNodeType = (node: MapNode) => node.type.sort().join("_");
+  const getNodeType = (types) => types.sort().join("_");
 
-  const newNodes = game.map.nodes.map((n: any) => {
-    n.title = n.players.map(x => x.name).join(', ');
-    n.x = n.fx;
-    n.y = n.fy;
-    n.type = getNodeType(n);
-    return n;
+  const newNodes = game.map.nodes.map((node: any) => {
+    node.type = getNodeType(node.types);
+    (node.id === game.highlightedNode?.id) ? node.subtype = "highlighted" : node.subtype = null;
+    return {...node};
   })
 
   const renderNodeText = (data: MapNode) => {
@@ -153,8 +178,10 @@ export function GameScreen({navigation}) {
         if (thief.name === username) {
           // always show yourself if you're the thief
           showThief = true;
-        } else if ([2, 7, 12, 17].includes(game.thiefMoves.length)) {
-          showThief = true;
+        } else {
+          if (SHOW_INDEXES.includes(game.thiefMoves.length)) {
+            showThief = true;
+          }
         }
       }
     }
@@ -186,6 +213,9 @@ export function GameScreen({navigation}) {
     edge1.style.stroke = "#aaaaaa";
   };
 
+  const ticketPicked = ()=>{
+    setShowTicketPicker(false);
+  }
   return (
     <View style={graph.container}>
       <svg viewBox="0 0 0 0" style={{height: 0}}>
@@ -197,6 +227,8 @@ export function GameScreen({navigation}) {
       <CurrentTurn/>
       <ThiefMoves/>
       <Players/>
+      <Tickets/>
+      {showTicketPicker ? <TicketPicker targetNode={selectedNode} close={ticketPicked}/> : null}
       <GraphView
         nodeKey={NODE_KEY}
         nodes={newNodes}
