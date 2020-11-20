@@ -23,11 +23,10 @@ export interface Player {
   }
 }
 
-export interface MapNode extends NodeObject {
+export interface MapNode {
   id: String;
   x: number;
   y: number;
-  type: TransportTypes[];
   types: TransportTypes[];
   players: Player[];
 }
@@ -39,7 +38,7 @@ export interface GameStatus {
 
 export interface GameState {
   id: String;
-  gameStatus: GameStatus;
+  gameStatus?: GameStatus;
   thiefMoves: TransportTypes[];
   players: Player[];
   currentTurn: Player;
