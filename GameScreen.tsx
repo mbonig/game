@@ -2,7 +2,7 @@ import React, {useContext, useEffect, useState} from "react";
 import {GraphView} from 'react-digraph';
 import {StyleSheet, View} from "react-native";
 import {FAST_COLOR, MEDIUM_COLOR, SLOW_COLOR} from "./styles";
-import {Game, getFastestTravel, User} from "./App";
+import {Game, User} from "./App";
 import {API, graphqlOperation} from "aws-amplify";
 import {onGameStateChange} from "./queries";
 import {MapNode, Player, PlayerTypes} from "./models";
@@ -12,8 +12,9 @@ import {CurrentTurn} from "./CurrentTurn";
 import {PlayerColors, Players} from "./Players";
 import {Tickets} from "./Tickets";
 import {TicketPicker} from "./TicketPicker";
+import {getTravel} from "./utils";
 
-const GraphConfig = {
+export const GraphConfig = {
   NodeTypes: {
     "1_slow": {
       typeText: "Slow",
@@ -52,6 +53,15 @@ const GraphConfig = {
         <symbol viewBox="0 0 100 100" id="sf" width="100" height="100">
           <circle r={20} cx={50} cy={50} fill={SLOW_COLOR}/>
           <circle r={10} cx={50} cy={50} fill={FAST_COLOR}/>
+        </symbol>
+      )
+    },
+    empty: {
+      typeText: "Empty",
+      shapeId: "#empty", // relates to the type property of a node
+      shape: (
+        <symbol viewBox="0 0 100 100" id="empty" width="100" height="100">
+          <circle r={10} cx={50} cy={50} fill="#aaaaaa"/>
         </symbol>
       )
     }
@@ -113,9 +123,8 @@ const graph = StyleSheet.create({
 
 export const SHOW_INDEXES = [2, 7, 12, 17];
 
-
 export function GameScreen({navigation}) {
-  const {game, movePlayer, setGame} = useContext(Game);
+  const {game, movePlayer, setGame, highlightNode} = useContext(Game);
   const {username} = useContext(User);
   const [showTicketPicker, setShowTicketPicker] = useState(false);
   const [selectedNode, setSelectedNode] = useState(null);
@@ -123,11 +132,12 @@ export function GameScreen({navigation}) {
     if (!node) {
       return;
     }
-    if (game.currentTurn.name !== username){
-      console.log(`It's not your turn yet...`);
+    if (game.currentTurn!.name !== username) {
+
+      highlightNode(node);
       return;
     }
-    if (game.players.find((p:Player)=>p.name === username)!.type === PlayerTypes.thief){
+    if (game.players.find((p: Player) => p.name === username)!.type === PlayerTypes.thief) {
       // if I'm a thief, display the ticket option window.
       setSelectedNode(node);
       setShowTicketPicker(true);
@@ -149,7 +159,7 @@ export function GameScreen({navigation}) {
   const newEdges = game.map.links.map(l => {
     const source = game.map.nodes.find(n => n.id === l.source);
     const target = game.map.nodes.find(n => n.id === l.target);
-    const fastestTravel = getFastestTravel({source, target});
+    const fastestTravel = getTravel({source, target});
     const edgeType = "edge_" + fastestTravel.toString().replace(/[0-9]_/i, '')
 
     return {
@@ -162,7 +172,7 @@ export function GameScreen({navigation}) {
 
   const newNodes = game.map.nodes.map((node: any) => {
     node.type = getNodeType(node.types);
-    (node.id === game.highlightedNode?.id) ? node.subtype = "highlighted" : node.subtype = null;
+    (node.id === game.highlightedNode?.id || game.highlightedNodes?.find(x => x.targetNodeId === node.id.toString())) ? node.subtype = "highlighted" : node.subtype = null;
     return {...node};
   })
 
@@ -171,6 +181,7 @@ export function GameScreen({navigation}) {
     const thief = data.players.find(x => x.type === PlayerTypes.thief)!;
 
     let showThief = false;
+    let visibleToAll = false;
     if (thief) {
       if (!!game.gameStatus?.status) {
         showThief = true;
@@ -180,6 +191,7 @@ export function GameScreen({navigation}) {
           showThief = true;
         } else {
           if (SHOW_INDEXES.includes(game.thiefMoves.length)) {
+            visibleToAll = true;
             showThief = true;
           }
         }
@@ -194,7 +206,7 @@ export function GameScreen({navigation}) {
       }
       const playerIndex = game.players.findIndex((x: Player) => x.name === player.name);
       const color = PlayerColors[playerIndex];
-
+      const playerName = `${player.name} ${visibleToAll ? '(visible)' : ''}`
       return (<text
         key={player.name}
         y={40 + (offset * 30)}
@@ -204,7 +216,7 @@ export function GameScreen({navigation}) {
           fill: color,
           fontWeight: "bold",
         }}
-        textAnchor="middle">{player.name}</text>);
+        textAnchor="middle">{playerName}</text>);
     });
   };
 
@@ -213,7 +225,7 @@ export function GameScreen({navigation}) {
     edge1.style.stroke = "#aaaaaa";
   };
 
-  const ticketPicked = ()=>{
+  const ticketPicked = () => {
     setShowTicketPicker(false);
   }
   return (

@@ -92,7 +92,7 @@ const createCurrentPlayerMapper = (player, targetNode) => (node) => {
   return node;
 };
 
-function getFastestTravel(node) {
+function getTravel(node) {
   const {source: {types: st}, target: {types: tt}} = node;
   let a = new Set(st);
   let b = new Set(tt);
@@ -130,7 +130,7 @@ exports.handler = async (event) => {
   const isOver = checkWinState(targetNode, currentGame);
 
   const sourceNode = currentGame.map.nodes.find((n) => n.players.find((p) => p.name === currentGame.currentTurn.name));
-  const moveType = getFastestTravel({target: targetNode, source: sourceNode});
+  const moveType = getTravel({target: targetNode, source: sourceNode});
   const isThief = currentGame.currentTurn.type === PlayerTypes.thief;
   let currentIndex = currentGame.players.findIndex(x => x.name === currentGame.currentTurn.name);
   if (currentIndex >= currentGame.players.length - 1) {

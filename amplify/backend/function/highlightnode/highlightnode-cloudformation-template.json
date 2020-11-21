@@ -33,12 +33,12 @@
         "FunctionName": {
           "Fn::If": [
             "ShouldNotCreateEnvResources",
-            "makemove",
+            "highlightnode",
             {
               "Fn::Join": [
                 "",
                 [
-                  "makemove",
+                  "highlightnode",
                   "-",
                   {
                     "Ref": "env"
@@ -72,7 +72,7 @@
         "Timeout": "25",
         "Code": {
           "S3Bucket": "amplify-ethrwars-dev-140615-deployment",
-          "S3Key": "amplify-builds/makemove-6f756274394541652b43-build.zip"
+          "S3Key": "amplify-builds/highlightnode-6a307849474c4c393978-build.zip"
         }
       }
     },
@@ -82,12 +82,12 @@
         "RoleName": {
           "Fn::If": [
             "ShouldNotCreateEnvResources",
-            "ethrwarsLambdaRole9ec1f9c5",
+            "ethrwarsLambdaRoled637d8f6",
             {
               "Fn::Join": [
                 "",
                 [
-                  "ethrwarsLambdaRole9ec1f9c5",
+                  "ethrwarsLambdaRoled637d8f6",
                   "-",
                   {
                     "Ref": "env"

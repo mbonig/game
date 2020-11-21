@@ -47,6 +47,10 @@ export const onGameStateChange = /* GraphQL */ `
           y
         }
       }
+      highlightedNodes {
+        username
+        targetNodeId
+      }
     }
   }
 `;

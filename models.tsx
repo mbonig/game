@@ -1,4 +1,3 @@
-import {LinkObject, NodeObject} from "react-force-graph-2d";
 import React from "react";
 
 export enum TransportTypes {
@@ -25,8 +24,9 @@ export interface Player {
 
 export interface MapNode {
   id: String;
-  x: number;
-  y: number;
+  x?: number;
+  y?: number;
+  type: String;
   types: TransportTypes[];
   players: Player[];
 }
@@ -41,17 +41,18 @@ export interface GameState {
   gameStatus?: GameStatus;
   thiefMoves: TransportTypes[];
   players: Player[];
-  currentTurn: Player;
+  currentTurn?: Player;
   map: {
     links: MapLink[];
     nodes: MapNode[];
   };
   copMarkers: any[];
-  highlightedNode?: MapNode
+  highlightedNode?: MapNode;
+  highlightedNodes: {username: string, targetNodeId: string}[]
 }
 
 
-export interface MapLink extends LinkObject {
+export interface MapLink {
   source: String;
   target: String;
 }

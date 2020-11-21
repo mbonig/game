@@ -18,7 +18,12 @@ const buttonStyles = StyleSheet.create({
   }
 });
 
-export const SimpleButton = ({title, onPress, disabled}) => (
+export interface SimpleButtonProps {
+  title: string;
+  onPress: Function;
+  disabled?: boolean;
+}
+export const SimpleButton = ({title, onPress, disabled}: SimpleButtonProps) => (
   <TouchableOpacity style={buttonStyles.button} onPress={onPress} disabled={disabled}>
     <Text style={buttonStyles.text}>{title}</Text>
   </TouchableOpacity>

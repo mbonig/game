@@ -47,6 +47,10 @@ export const waitingRoom = /* GraphQL */ `
           y
         }
       }
+      highlightedNodes {
+        username
+        targetNodeId
+      }
     }
   }
 `;

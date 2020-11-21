@@ -1,8 +1,9 @@
 import React, {useContext} from "react";
 import {StyleSheet, Text, View} from "react-native";
-import {Game, getFastestTravel, User} from "./App";
+import {Game, User} from "./App";
 import {MapNode, Player} from "./models";
 import {SimpleButton} from "./SimpleButton";
+import {getTravel} from "./utils";
 
 const styles = StyleSheet.create({
   container: {
@@ -34,7 +35,7 @@ export const TicketPicker = ({targetNode, close}: { targetNode: MapNode, close: 
   const me = game.players.find((p: Player) => p.name === username)!;
   const myTickets = me.tickets;
   const currentNode = game.map.nodes.find((n: MapNode) => n.players.find((p: Player) => p.name === username));
-  const travel = getFastestTravel({source: currentNode, target: targetNode});
+  const travel = getTravel({source: currentNode, target: targetNode});
 
   const onPress = (ticket: String) => () => {
     movePlayer(targetNode, ticket);
