@@ -1,5 +1,5 @@
 import React, {useContext, useEffect} from "react";
-import {FlatList, Text, View} from 'react-native';
+import {FlatList, Text, View, StyleSheet} from 'react-native';
 import {styles} from "./styles";
 import {Game} from "./App";
 import {GameState} from "./models";
@@ -8,10 +8,15 @@ import {API, graphqlOperation} from "aws-amplify";
 import {SimpleButton} from "./SimpleButton";
 import {onGameStateChange, startGame} from "./queries";
 
+const playerStyles = StyleSheet.create({
+  name:{
+    fontSize: 20
+  }
+});
 
 const PlayerItem = ({item}) => {
   const {name} = item;
-  return <Text>{name}</Text>;
+  return <Text style={playerStyles.name}>{name}</Text>;
 };
 
 export function WaitingRoom({navigation}) {
@@ -42,7 +47,7 @@ export function WaitingRoom({navigation}) {
 
   return (
     <View style={styles.centered}>
-      <Text>Game Id: <Text style={{fontWeight: "bold"}}>{game.id}</Text> (share this with others)</Text>
+      <Text style={playerStyles.name}>Game Id: <Text style={{fontWeight: "bold"}}>{game.id}</Text> (share this with others)</Text>
       <Text>Players:</Text>
       <FlatList
         data={game.players}
