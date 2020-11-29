@@ -8,15 +8,11 @@ const transportTypeTicketMap = {
   "3_fast": "fast"
 }
 
-function getTicketToUse(targetNode, currentGame, ticket) {
-  const playersCurrentNode = currentGame.map.nodes.find(n => n.players.find(p => p.name === currentGame.currentTurn.name));
+function getTicketToUse(targetNode, currentGame, playersCurrentNode, currentPlayer) {
+  if (!playersCurrentNode) playersCurrentNode = currentGame.map.nodes.find(n => n.players.find(p => p.name === currentGame.currentTurn.name));
+  if (!currentPlayer) currentPlayer = currentGame.players.find(x => x.name === currentGame.currentTurn.name);
 
   const transportTypes = getAllTravel({source: playersCurrentNode, target: targetNode});
-  const currentPlayer = currentGame.players.find(x => x.name === currentGame.currentTurn.name);
-
-  if (ticket === 'black' && currentPlayer.tickets.black > 0) {
-    return 'black';
-  }
 
   for (const transportType of transportTypes) {
     const t = transportTypeTicketMap[transportType]
@@ -28,14 +24,22 @@ function getTicketToUse(targetNode, currentGame, ticket) {
   return null;
 }
 
+function getCurrentPlayersNode(currentGame) {
+  return currentGame.map.nodes.find(n => n.players.find(p => p.name === currentGame.currentTurn.name));
+}
+
+function getAvailableTargetNodes(currentGame, sourceNode) {
+  return currentGame.map.links.filter(l => l.source === sourceNode.id || l.target === sourceNode.id)
+    .map(l => l.source === sourceNode.id ? l.target : l.source);
+}
+
 function checkValidMove(targetNode, currentGame, ticket) {
 
   if (currentGame.gameStatus && currentGame.gameStatus.status) {
     return false;
   }
-  const playersCurrentNode = currentGame.map.nodes.find(n => n.players.find(p => p.name === currentGame.currentTurn.name));
-  const availableTargetNodes = currentGame.map.links.filter(l => l.source === playersCurrentNode.id || l.target === playersCurrentNode.id)
-    .map(l => l.source === playersCurrentNode.id ? l.target : l.source);
+  const playersCurrentNode = getCurrentPlayersNode(currentGame);
+  const availableTargetNodes = getAvailableTargetNodes(currentGame, playersCurrentNode);
 
   const currentPlayer = currentGame.players.find(x => x.name === currentGame.currentTurn.name);
   if (ticket === 'black' && currentPlayer.tickets.black > 0) {
@@ -81,6 +85,19 @@ function checkWinState(targetNode, currentGame) {
       winner: 'Cops'
     };
   }
+
+  // now we need to see if any player can make a move, as long as one player can still make a move, the game is not over.
+  for (const player of currentGame.players) {
+    const playersNode = currentGame.map.nodes.find(n => n.players.find(p => p.name === player.name));
+    if (canMoveSomewhere(currentGame, playersNode, player)) {
+      return;
+    }
+  }
+
+  return {
+    status: 'Finished',
+    winner: 'Thief'
+  }
 }
 
 const createCurrentPlayerMapper = (player, targetNode) => (node) => {
@@ -108,19 +125,61 @@ function getAllTravel(link) {
   return [...intersection].sort().reverse();
 }
 
+function getNextPlayer(game) {
+  let currentIndex = game.players.findIndex(x => x.name === game.currentTurn.name);
+  if (currentIndex >= game.players.length - 1) {
+    currentIndex = -1;
+  }
+
+  return game.players[currentIndex + 1];
+}
+
+function iCanMoveSomewhere(game) {
+  // look at all the nodes that the current player and move to.
+  const currentNode = getCurrentPlayersNode(game);
+  return canMoveSomewhere(game, currentNode);
+}
+
+function canMoveSomewhere(game, currentNode, player) {
+  const availableTargetNodes = getAvailableTargetNodes(game, currentNode);
+
+  // see if they have enough tickets to make any of those moves.
+  for (const targetNodeId of availableTargetNodes) {
+    const targetNode = game.map.nodes.find(n => n.id === targetNodeId);
+    const ticketToUse = getTicketToUse(targetNode, game, currentNode, player);
+    if (!!ticketToUse) {
+      return true;
+    }
+  }
+  return false;
+
+}
+
 
 exports.handler = async (event) => {
-  console.log({event});
+  //console.log({event});
   const {arguments: {id, targetNodeId, myself, ticket}} = event;
 
   const {Item: currentGame} = await ddb.get({Key: {id}, TableName: TABLE}).promise();
 
+  // if this ain't my turn, den just do nothing
   if (currentGame.currentTurn.name !== myself) {
     return currentGame;
   }
-  const me = currentGame.players.find(x => x.name === myself);
 
+  const me = currentGame.players.find(x => x.name === myself);
   const targetNode = currentGame.map.nodes.find(x => x.id === targetNodeId);
+
+  if (!iCanMoveSomewhere(currentGame)) {
+    // pass turn
+    const updatedGame = {
+      ...currentGame,
+      currentTurn: getNextPlayer(currentGame),
+      gameStatus: checkWinState(targetNode, currentGame)
+    }
+    await ddb.put({TableName: TABLE, Item: updatedGame}).promise();
+    return updatedGame;
+  }
 
   if (!checkValidMove(targetNode, currentGame, ticket)) {
     console.log("Not a valid move", targetNode, currentGame);
@@ -132,10 +191,6 @@ exports.handler = async (event) => {
   const sourceNode = currentGame.map.nodes.find((n) => n.players.find((p) => p.name === currentGame.currentTurn.name));
   const moveType = getTravel({target: targetNode, source: sourceNode});
   const isThief = currentGame.currentTurn.type === PlayerTypes.thief;
-  let currentIndex = currentGame.players.findIndex(x => x.name === currentGame.currentTurn.name);
-  if (currentIndex >= currentGame.players.length - 1) {
-    currentIndex = -1;
-  }
 
   let ticketUsed;
   if (!ticket) {
@@ -162,7 +217,7 @@ exports.handler = async (event) => {
   const newGame = {
     ...currentGame,
     players: newPlayers,
-    currentTurn: currentGame.players[currentIndex + 1],
+    currentTurn: getNextPlayer(currentGame),
     map: {
       nodes: currentMap.nodes.map(createCurrentPlayerMapper(currentPlayer, targetNode)),
       links: [...currentMap.links]

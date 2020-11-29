@@ -48,7 +48,7 @@ export interface GameState {
   };
   copMarkers: any[];
   highlightedNode?: MapNode;
-  highlightedNodes: {username: string, targetNodeId: string}[]
+  highlightedNodes?: {username: string, targetNodeId: string}[]
 }
 
 

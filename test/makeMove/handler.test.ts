@@ -7,6 +7,7 @@ process.env.TABLE = TEST_TABLE;
 const {handler} = require('../../amplify/backend/function/makemove/src/');
 
 const db = new DynamoDB.DocumentClient();
+
 const playerOne: Player = {
   name: "Matt",
   type: PlayerTypes.thief,
@@ -50,14 +51,14 @@ describe('make move', () => {
       map: {
         links: [
           {source: "1", target: "2"},
-          {source: "1", target: "3"},
+          {source: "1", target: "3"}
         ],
         nodes: [
           {id: "1", type: '', players: [playerOne], types: [TransportTypes.slow, TransportTypes.medium], x: 1, y: 1},
           {id: "2", type: '', players: [playerTwo], types: [TransportTypes.slow], x: 1, y: 1},
           {id: "3", type: '', players: [], types: [TransportTypes.medium], x: 1, y: 1},
           {id: "4", type: '', players: [], types: [TransportTypes.fast], x: 1, y: 1},
-        ]
+        ],
       },
       players: [playerOne, playerTwo],
       thiefMoves: [],
@@ -92,13 +93,14 @@ describe('make move', () => {
     awsSdkPromiseResponse.mockReset();
     let newPlayer = {...playerOne};
     newPlayer.tickets.slow = 0;
-    awsSdkPromiseResponse.mockReturnValueOnce({Item: {...game, players: [newPlayer]}});
+    let existingGame = {...game, players: [newPlayer]};
+    awsSdkPromiseResponse.mockReturnValueOnce({Item: existingGame});
     testEvent.arguments.targetNodeId = "2";
 
     const currentGame = await handler(testEvent);
 
     expect(db.put).not.toHaveBeenCalled();
-    expect(currentGame).toEqual(game);
+    expect(currentGame).toEqual(existingGame);
   });
 
   it("reduces ticket used", async () => {
@@ -127,4 +129,41 @@ describe('make move', () => {
     expect(db.put).toHaveBeenCalled();
     expect(currentGame.players[0].tickets.medium).toEqual(2);
   });
+
+  const noTickets = {
+    fast: 0,
+    slow: 0,
+    medium: 0
+  }
+
+  it("any player move passes if doesn't have the tickets to move anywhere", async () => {
+    awsSdkPromiseResponse.mockReset();
+    const newPlayer = {...playerOne, tickets: noTickets};
+    const existingGame = {...game, players: [newPlayer, playerTwo]};
+    awsSdkPromiseResponse.mockReturnValueOnce({Item: existingGame});
+    testEvent.arguments.targetNodeId = "3";
+    testEvent.arguments.ticket = '';
+
+    const currentGame = await <GameState>handler(testEvent);
+
+    expect(db.put).toHaveBeenCalled();
+    expect(currentGame).toEqual({...existingGame, currentTurn: playerTwo});
+  });
+
+
+  it("game is over if all players pass, thief wins", async () => {
+    awsSdkPromiseResponse.mockReset();
+
+    let newPlayerOne = {...playerOne, tickets: noTickets};
+    let newPlayerTwo = {...playerTwo, tickets: noTickets};
+    awsSdkPromiseResponse.mockReturnValueOnce({Item: {...game, players: [newPlayerOne, newPlayerTwo]}});
+    testEvent.arguments.targetNodeId = "3";
+    testEvent.arguments.ticket = '';
+
+    const currentGame = await <GameState>handler(testEvent);
+
+    expect(db.put).toHaveBeenCalled();
+    expect(currentGame.gameStatus).toEqual({status: 'Finished', winner: 'Thief'});
+  });
+
 });
