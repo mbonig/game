@@ -72,7 +72,7 @@
         "Timeout": "25",
         "Code": {
           "S3Bucket": "amplify-ethrwars-dev-140615-deployment",
-          "S3Key": "amplify-builds/makemove-6f756274394541652b43-build.zip"
+          "S3Key": "amplify-builds/makemove-725936507349425a3949-build.zip"
         }
       }
     },
