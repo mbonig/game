@@ -222,6 +222,7 @@ exports.handler = async (event) => {
       nodes: currentMap.nodes.map(createCurrentPlayerMapper(currentPlayer, targetNode)),
       links: [...currentMap.links]
     },
+    status: isOver ? 'Over' : currentGame.status,
     gameStatus: isOver,
     thiefMoves
   };

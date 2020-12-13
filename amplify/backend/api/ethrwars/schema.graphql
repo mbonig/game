@@ -55,6 +55,7 @@ type Game
 {
   id: ID!
   status: String
+  host: String
   gameStatus: GameStatus
   thiefMoves: [ThiefMove!]
   players: [Player!]!
@@ -64,11 +65,11 @@ type Game
 }
 
 type Query {
-    waitingRoom: [Game]
+    waitingRoom: [Game] @function(name: "waitingroom-${env}")
 }
 
 type Mutation {
-    createGame(myself: String!): Game @function(name: "creategame-${env}")
+    createGame(myself: String!): [Game] @function(name: "creategame-${env}")
     startGame(id: ID!): Game @function(name: "startgame-${env}")
     joinGame(id: ID!, myself: String!): Game @function(name: "joingame-${env}")
     makeMove(id: ID!, myself: String!, targetNodeId: String!, ticket: String): Game @function(name: "makemove-${env}")
@@ -77,4 +78,5 @@ type Mutation {
 
 type Subscription {
     onGameStateChange(id: ID!): Game @aws_subscribe (mutations: ["makeMove", "joinGame", "startGame", "highlightNode"])
+    onNewWaitingRoom: [Game] @aws_subscribe (mutations: ["createGame"])
 }

@@ -12,18 +12,39 @@ function randomString(size = 6) {
     .toLowerCase();
 }
 
-exports.handler = async (event) => {
+function floatToTop(items, game) {
+  return items.sort((x,y)=>x.id === game.id ? -1 : 1);
+}
 
+exports.handler = async (event) => {
   console.log({event});
-  if (!event.arguments.myself) {
+
+  const {myself} = event.arguments;
+
+  if (!myself) {
     throw new Error("Please provide your name at the myself field.");
   }
+
   const game = {
     id: randomString(),
-    players: [{name: event.arguments.myself}],
-    status: 'Waiting'
+    players: [{name: myself}],
+    status: 'Waiting',
+    host: myself
   }
   await ddb.put({TableName: TABLE, Item: game}).promise();
 
-  return game;
+  const {Items: items} = await ddb.query({
+    TableName: TABLE,
+    IndexName: "waitingRoom",
+    KeyConditionExpression: "#status = :waiting",
+    ExpressionAttributeValues: {
+      ":waiting": "Waiting"
+    },
+    ExpressionAttributeNames: {
+      "#status": "status"
+    }
+  }).promise();
+
+
+  return floatToTop(items, game);
 };

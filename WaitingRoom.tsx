@@ -1,7 +1,7 @@
 import React, {useContext, useEffect} from "react";
 import {FlatList, Text, View, StyleSheet} from 'react-native';
 import {styles} from "./styles";
-import {Game} from "./App";
+import {Game, User} from "./App";
 import {GameState} from "./models";
 
 import {API, graphqlOperation} from "aws-amplify";
@@ -21,6 +21,7 @@ const PlayerItem = ({item}) => {
 
 export function WaitingRoom({navigation}) {
   const {game, setGame}: { game: GameState, [key: string]: any } = useContext(Game);
+  const {username} = useContext(User);
 
   useEffect(() => {
     const subscriber = API.graphql(graphqlOperation(onGameStateChange, {id: game.id})).subscribe({
@@ -45,16 +46,14 @@ export function WaitingRoom({navigation}) {
     navigation.navigate('Game');
   }
 
+  let minNumberOfPlayers = 2;
   return (
     <View style={styles.centered}>
       <Text style={playerStyles.name}>Game Id: <Text style={{fontWeight: "bold"}}>{game.id}</Text> (share this with others)</Text>
-      <Text>Players:</Text>
-      <FlatList
-        data={game.players}
-        renderItem={PlayerItem}
-        keyExtractor={({name}) => name}
-      />
-      <SimpleButton title="Start" onPress={onStartPress}/>
+      <Text style={{marginBottom: 10}}>Players:</Text>
+      { game.players.map(x=><PlayerItem key={x.name} item={x}/>) }
+      { game.players.length < minNumberOfPlayers ? <Text style={{margin: 10}}>Need more players!</Text> : null}
+      { game.host === username && game.players.length >= minNumberOfPlayers ? <SimpleButton title="Start" onPress={onStartPress}/> : null}
     </View>
   );
 }

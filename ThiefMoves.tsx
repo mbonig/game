@@ -40,7 +40,7 @@ const ThiefMoveItem = (setHighlightedNode) => ({item, index}) => {
 export const ThiefMoves = () => {
   const {game, setHighlightedNode} = useContext(Game);
   return (<FlatList
-    horizontal={true}
+    horizontal={false}
     style={thiefMovesStyles.container}
     data={game.thiefMoves}
     renderItem={ThiefMoveItem(setHighlightedNode)}
@@ -56,8 +56,12 @@ export const BLACK_COLOR = '#ac1919';
 
 const thiefMovesStyles = StyleSheet.create({
   container: {
-    flexDirection: 'row',
+    flexDirection: 'column',
     backgroundColor: '#111111',
+    position: "absolute",
+    top: 144,
+    left: 0,
+    zIndex: 100
   },
   item: {
     padding: 10,

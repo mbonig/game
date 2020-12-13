@@ -10,11 +10,11 @@ import {GameState, MapNode} from "./models";
 import {HomeScreen} from "./Home";
 import {WaitingRoom} from "./WaitingRoom";
 import {JoinGame} from "./JoinGame";
-import {makeMove, highlightNode as hnQuery} from "./queries";
+import {highlightNode as hnQuery, makeMove} from "./queries";
 import {FindGame} from "./FindGame";
 import {GameScreen} from "./GameScreen";
 import {MapEditor} from "./MapEditor";
-import {useLocalStorage, useSessionStorage} from "./utils";
+import {useSessionStorage} from "./utils";
 
 Amplify.configure(config)
 const Stack = createStackNavigator();
@@ -59,12 +59,20 @@ const initialState: GameState = {
 export default function App() {
   const [game, setGame] = useState(initialState);
   const [username, setUsername] = useSessionStorage("username", "");
+  const [lastGameId, setLastGameId] = useSessionStorage("lastGameId", "");
+
+  const setGameWrapper = (game) => {
+    if (game.id) {
+      setLastGameId(game.id)
+    }
+    setGame(game);
+  }
 
   const movePlayer = (targetNode: MapNode, ticket: string) => {
     API.graphql(graphqlOperation(makeMove, {id: game.id, myself: username, targetNodeId: targetNode.id, ticket}));
   };
 
-  const highlightNode = (targetNode: MapNode)=>{
+  const highlightNode = (targetNode: MapNode) => {
     API.graphql(graphqlOperation(hnQuery, {id: game.id, myself: username, targetNodeId: targetNode.id}));
   }
   const setHighlightedNode = (node: MapNode) => {
@@ -76,7 +84,7 @@ export default function App() {
 
   return (
     <User.Provider value={{username, setUsername}}>
-      <Game.Provider value={{game, movePlayer, setGame, setHighlightedNode, highlightNode}}>
+      <Game.Provider value={{game, movePlayer, setGame: setGameWrapper, setHighlightedNode, highlightNode}}>
         <NavigationContainer>
           <Stack.Navigator detachInactiveScreens={true}>
             <Stack.Screen
@@ -94,16 +102,7 @@ export default function App() {
               name="Game"
               component={GameScreen}
               options={{
-                headerShown: false,
-                headerStyle: {
-                  backgroundColor: '#000000'
-                },
-                headerTintColor: '#aaaaaa',
-                headerTitleStyle: {
-                  fontSize: 12,
-                  fontWeight: 'bold',
-                  color: '#aaaaaa',
-                }
+                headerShown: false
               }}
             />
             <Stack.Screen

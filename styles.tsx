@@ -10,7 +10,8 @@ export const styles = StyleSheet.create({
   centered: {
     flex: 1,
     justifyContent: "center",
-    alignItems: "center"
+    alignItems: "center",
+    height: "100%"
   }
 });
 export const SLOW_COLOR = '#fdf919';

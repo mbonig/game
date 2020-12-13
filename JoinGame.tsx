@@ -5,10 +5,12 @@ import {Game, User} from "./App";
 import {styles} from "./styles";
 import {joinGame} from "./queries";
 import {SimpleButton} from "./SimpleButton";
+import {useSessionStorage} from "./utils";
 
 export const JoinGame = ({navigation}) => {
   const {setGame} = useContext(Game);
-  const [gameId, setGameId] = useState("8b15zd");
+  const [lastGameId] = useSessionStorage("lastGameId", "");
+  const [gameId, setGameId] = useState(lastGameId);
   const {username} = useContext(User);
 
   async function onJoinGame() {

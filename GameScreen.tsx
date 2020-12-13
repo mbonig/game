@@ -189,6 +189,9 @@ export function GameScreen({navigation}) {
         if (thief.name === username) {
           // always show yourself if you're the thief
           showThief = true;
+          if (SHOW_INDEXES.includes(game.thiefMoves.length)) {
+            visibleToAll = true;
+          }
         } else {
           if (SHOW_INDEXES.includes(game.thiefMoves.length)) {
             visibleToAll = true;

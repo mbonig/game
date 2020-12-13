@@ -72,7 +72,7 @@
         "Timeout": "25",
         "Code": {
           "S3Bucket": "amplify-ethrwars-dev-140615-deployment",
-          "S3Key": "amplify-builds/creategame-66475943414a6e773335-build.zip"
+          "S3Key": "amplify-builds/creategame-6d2f65366f2f58795445-build.zip"
         }
       }
     },
@@ -163,6 +163,22 @@
               "Resource": {
                 "Fn::Sub": [
                   "arn:aws:dynamodb:us-east-1:536309290949:table/${table}",
+                  {
+                    "table": {
+                      "Fn::ImportValue": "s5zf46owgndsllya5jboviw5qi:GetAtt:GameTable:Name"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "Effect": "Allow",
+              "Action": [
+                "dynamodb:Query"
+              ],
+              "Resource": {
+                "Fn::Sub": [
+                  "arn:aws:dynamodb:us-east-1:536309290949:table/${table}/index/*",
                   {
                     "table": {
                       "Fn::ImportValue": "s5zf46owgndsllya5jboviw5qi:GetAtt:GameTable:Name"

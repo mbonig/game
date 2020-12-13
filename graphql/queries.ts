@@ -7,6 +7,7 @@ export const waitingRoom = /* GraphQL */ `
     waitingRoom {
       id
       status
+      host
       gameStatus {
         status
         winner

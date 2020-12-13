@@ -21,7 +21,7 @@ export const NewGame = ({navigation}) => {
   async function fetchGame() {
     const {
       data: {
-        createGame: game
+        createGame: [game] // we do an array reference because after creation all waiting games are returned.
       }
     } = await API.graphql(graphqlOperation(createGame, {myself: username}));
     setGame(game);

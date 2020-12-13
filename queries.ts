@@ -1,8 +1,61 @@
+export const onNewWaitingRoom = /* GraphQL */ `
+  subscription OnNewWaitingRoom {
+    onNewWaitingRoom {
+      id
+      status
+      host
+      gameStatus {
+        status
+        winner
+      }
+      thiefMoves {
+        type
+        nodeId
+      }
+      players {
+        name
+        type
+        tickets {
+          slow
+          medium
+          fast
+          black
+        }
+      }
+      currentTurn {
+        name
+        type
+      }
+      highlightedNodes {
+        username
+        targetNodeId
+      }
+      map {
+        links {
+          source
+          target
+        }
+        nodes {
+          id
+          types
+          x
+          y
+          players {
+            name
+            type
+          }
+        }
+      }
+    }
+  }
+`;
+
 export const onGameStateChange = /* GraphQL */ `
   subscription OnGameStateChange($id: ID!) {
     onGameStateChange(id: $id) {
       id
       status
+      host
       gameStatus {
         status
         winner
@@ -53,6 +106,7 @@ export const startGame = /* GraphQL */ `
     startGame(id: $id) {
       id
       status
+      host
       gameStatus {
         status
         winner
@@ -99,6 +153,7 @@ export const joinGame = /* GraphQL */ `
     joinGame(id: $id, myself: $myself) {
       id
       status
+      host
       gameStatus {
         status
         winner
@@ -148,6 +203,7 @@ export const makeMove = /* GraphQL */ `
   mutation MakeMove($id: ID!, $myself: String!, $targetNodeId: String!, $ticket: String) {
     makeMove(id: $id, myself: $myself, targetNodeId: $targetNodeId, ticket: $ticket) {
       id
+      host
       gameStatus {
         status
         winner
@@ -198,6 +254,7 @@ export const highlightNode = /* GraphQL */ `
   mutation HighlightNode($id: ID!, $myself: String!, $targetNodeId: String!) {
     highlightNode(id: $id, myself: $myself, targetNodeId: $targetNodeId) {
       id
+      host
       gameStatus {
         status
         winner

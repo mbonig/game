@@ -38,6 +38,7 @@ export interface GameStatus {
 
 export interface GameState {
   id: String;
+  status: String;
   gameStatus?: GameStatus;
   thiefMoves: TransportTypes[];
   players: Player[];
@@ -48,7 +49,8 @@ export interface GameState {
   };
   copMarkers: any[];
   highlightedNode?: MapNode;
-  highlightedNodes?: {username: string, targetNodeId: string}[]
+  highlightedNodes?: {username: string, targetNodeId: string}[];
+  host: String;
 }
 
 

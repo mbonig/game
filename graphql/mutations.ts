@@ -7,6 +7,7 @@ export const createGame = /* GraphQL */ `
     createGame(myself: $myself) {
       id
       status
+      host
       gameStatus {
         status
         winner
@@ -59,6 +60,7 @@ export const startGame = /* GraphQL */ `
     startGame(id: $id) {
       id
       status
+      host
       gameStatus {
         status
         winner
@@ -111,6 +113,7 @@ export const joinGame = /* GraphQL */ `
     joinGame(id: $id, myself: $myself) {
       id
       status
+      host
       gameStatus {
         status
         winner
@@ -173,6 +176,7 @@ export const makeMove = /* GraphQL */ `
     ) {
       id
       status
+      host
       gameStatus {
         status
         winner
@@ -225,6 +229,7 @@ export const highlightNode = /* GraphQL */ `
     highlightNode(id: $id, myself: $myself, targetNodeId: $targetNodeId) {
       id
       status
+      host
       gameStatus {
         status
         winner

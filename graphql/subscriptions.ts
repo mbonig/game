@@ -7,6 +7,60 @@ export const onGameStateChange = /* GraphQL */ `
     onGameStateChange(id: $id) {
       id
       status
+      host
+      gameStatus {
+        status
+        winner
+      }
+      thiefMoves {
+        type
+        nodeId
+      }
+      players {
+        name
+        type
+        tickets {
+          slow
+          medium
+          fast
+          black
+        }
+      }
+      currentTurn {
+        name
+        type
+        tickets {
+          slow
+          medium
+          fast
+          black
+        }
+      }
+      map {
+        links {
+          source
+          target
+        }
+        nodes {
+          id
+          types
+          x
+          y
+        }
+      }
+      highlightedNodes {
+        username
+        targetNodeId
+      }
+    }
+  }
+`;
+export const onNewWaitingRoom = /* GraphQL */ `
+  subscription OnNewWaitingRoom {
+    onNewWaitingRoom {
+      id
+      status
+      host
       gameStatus {
         status
         winner
