@@ -137,13 +137,9 @@ export function GameScreen({navigation}) {
       highlightNode(node);
       return;
     }
-    if (game.players.find((p: Player) => p.name === username)!.type === PlayerTypes.thief) {
-      // if I'm a thief, display the ticket option window.
-      setSelectedNode(node);
-      setShowTicketPicker(true);
-      return;
-    }
-    movePlayer(node);
+
+    setSelectedNode(node);
+    setShowTicketPicker(true);
   }
 
   useEffect(() => {

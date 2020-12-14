@@ -48,9 +48,9 @@ export const TicketPicker = ({targetNode, close}: { targetNode: MapNode, close: 
     <SimpleButton onPress={onPress(getName(travel))}
                   disabled={myTickets[getName(travel)] === 0}
                   title={`${getName(travel)} : ${myTickets[getName(travel)]} left`}/>
-    <SimpleButton onPress={onPress('black')}
+    {me.type === "thief" ? <SimpleButton onPress={onPress('black')}
                   disabled={myTickets.black === 0}
-                  title={`black : ${myTickets.black} left`}/>
+                  title={`black : ${myTickets.black} left`}/> : null }
     <SimpleButton onPress={close}
                   title={`Cancel move`}/>
   </View>
