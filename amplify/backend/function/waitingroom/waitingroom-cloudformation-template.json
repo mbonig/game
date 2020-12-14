@@ -72,7 +72,7 @@
         "Timeout": "25",
         "Code": {
           "S3Bucket": "amplify-ethrwars-dev-140615-deployment",
-          "S3Key": "amplify-builds/waitingroom-714e68764d6152595233-build.zip"
+          "S3Key": "amplify-builds/waitingroom-5232355069737663332f-build.zip"
         }
       }
     },

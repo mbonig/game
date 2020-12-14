@@ -4,7 +4,7 @@ const TABLE = process.env.TABLE;
 exports.handler = async (event) => {
   console.log({event, TABLE});
   const {arguments: {myself: name, id}} = event;
-  const {Item: game} = await ddb.get({Key: {id}, TableName: TABLE}).promise();
+  const {Item: game} = await ddb.get({Key: {id: id.toLowerCase()}, TableName: TABLE}).promise();
 
   if (!game.players.find(p => p.name === name)) {
     game.players.push({name});
