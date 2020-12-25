@@ -1,4 +1,4 @@
-import React from 'React';
+import React from 'react';
 import {Image, Text as BaseText, View} from 'react-native';
 import {styles} from "./styles";
 
@@ -8,9 +8,11 @@ export const Help = () => {
   return <View style={[styles.container, {padding: 20, maxWidth: 800, marginLeft: "auto", marginRight: "auto"}]}>
     <Text>A thief has stolen valuable data and is on the run. Cops are hot on the trail!</Text>
     <Image style={{width: "100%", height: "400px", resizeMode: "contain"}} source={require('./assets/example.png')}/>
-    <Text>If you are a cop, your job is to catch the thief by occupying the same node as the thief. If you do, the game is over and the cops win.</Text>
+    <Text>If you are a cop, your job is to catch the thief by occupying the same node as the thief. If you do, the game
+      is over and the cops win.</Text>
 
-    <Text>If you are the thief it's you're job to run from the cops until all turns are taken (or nobody can move).</Text>
+    <Text>If you are the thief it's you're job to run from the cops until all turns are taken (or nobody can
+      move).</Text>
 
     <Text>Players move from node to node by either a slow, medium, or fast ticket. Each player gets a set amount of
       travel tickets
