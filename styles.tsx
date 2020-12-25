@@ -16,4 +16,5 @@ export const styles = StyleSheet.create({
 });
 export const SLOW_COLOR = '#fdf919';
 export const MEDIUM_COLOR = '#009900';
-export const FAST_COLOR = '#8519ac';
+export const FAST_COLOR = '#177fec';
+export const BLACK_COLOR = '#ac1919';

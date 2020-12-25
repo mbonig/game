@@ -3,6 +3,7 @@ import {FlatList, StyleSheet, Text} from "react-native";
 import {TransportTypes} from "./models";
 import {Game} from "./App";
 import {SHOW_INDEXES} from "./GameScreen";
+import {BLACK_COLOR, FAST_COLOR, MEDIUM_COLOR, SLOW_COLOR} from "./styles";
 
 const ThiefMoveItem = (setHighlightedNode) => ({item, index}) => {
   let itemStyle;
@@ -48,12 +49,6 @@ export const ThiefMoves = () => {
 }
 
 
-export const SLOW_COLOR = '#fdf919';
-export const MEDIUM_COLOR = '#009900';
-export const FAST_COLOR = '#8519ac';
-export const BLACK_COLOR = '#ac1919';
-
-
 const thiefMovesStyles = StyleSheet.create({
   container: {
     flexDirection: 'column',
@@ -82,6 +77,6 @@ const thiefMovesStyles = StyleSheet.create({
     color: BLACK_COLOR
   },
   highlighted: {
-    backgroundColor: '#777777'
+    backgroundColor: '#4e4e4e'
   }
 });

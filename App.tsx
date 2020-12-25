@@ -15,6 +15,7 @@ import {FindGame} from "./FindGame";
 import {GameScreen} from "./GameScreen";
 import {MapEditor} from "./MapEditor";
 import {useSessionStorage} from "./utils";
+import {Help} from "./Help";
 
 Amplify.configure(config)
 const Stack = createStackNavigator();
@@ -86,7 +87,7 @@ export default function App() {
     <User.Provider value={{username, setUsername}}>
       <Game.Provider value={{game, movePlayer, setGame: setGameWrapper, setHighlightedNode, highlightNode}}>
         <NavigationContainer>
-          <Stack.Navigator detachInactiveScreens={true}>
+          <Stack.Navigator detachInactiveScreens={true} >
             <Stack.Screen
               name="Home"
               component={HomeScreen}
@@ -94,6 +95,7 @@ export default function App() {
                 headerShown: false,
               }}
             />
+            <Stack.Screen name="Help" component={Help}/>
             <Stack.Screen name="New Game" component={NewGame}/>
             <Stack.Screen name="Waiting Room" component={WaitingRoom}/>
             <Stack.Screen name="Join Game" component={JoinGame}/>

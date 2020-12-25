@@ -253,6 +253,7 @@ export function GameScreen({navigation}) {
         onSelectNode={handleNodeClick}
         afterRenderEdge={afterRenderEdge}
         backgroundFillId="#fill"
+        showGraphControls={false}
         readOnly={true}
       />
     </View>
