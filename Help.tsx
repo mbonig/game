@@ -21,7 +21,9 @@ export const Help = () => {
     <Image style={{width: "100%", height: "60px", resizeMode: "contain"}} source={require('./assets/tickets.png')}/>
     <Text>The thief is not visible and must sneak around the map leaving a trail of the tickets he/she has used to
       travel.
-      However, the thief does become visible for one move, after the 2nd, 7th, 12th and 17th moves.</Text>
+      However, the thief does become visible for one move, after the 2nd, 7th, 12th and 17th moves. If you tap on that
+    move in the list of moves the node will be highlighted. You can also highlight a node by clicking on it when
+    it isn't your turn. This is a good way to communicate with your fellow cops (or throw them off if you're the thief.</Text>
 
     <Image style={{width: "100%", height: "300px", resizeMode: "contain"}}
            source={require('./assets/thief_moves.png')}/>
