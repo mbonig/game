@@ -1,6 +1,7 @@
 const AWS = require('aws-sdk');
 const ddb = new AWS.DynamoDB.DocumentClient();
 const TABLE = process.env.TABLE;
+const USES_SK = process.env.USES_SK;
 
 const transportTypeTicketMap = {
   "1_slow": "slow",
@@ -160,7 +161,11 @@ exports.handler = async (event) => {
   //console.log({event});
   const {arguments: {id, targetNodeId, myself, ticket}} = event;
 
-  const {Item: currentGame} = await ddb.get({Key: {id}, TableName: TABLE}).promise();
+  let params = {Key: {id}, TableName: TABLE};
+  if (USES_SK) {
+    params.Key.sk = params.Key.id;
+  }
+  const {Item: currentGame} = await ddb.get(params).promise();
 
   // if this ain't my turn, den just do nothing
   if (currentGame.currentTurn.name !== myself) {

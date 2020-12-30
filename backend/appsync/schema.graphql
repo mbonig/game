@@ -1,0 +1,74 @@
+type GameStatus {
+  status: String!
+  winner: String!
+}
+
+type Tickets {
+  slow: Int!
+  medium: Int!
+  fast: Int!
+  black: Int
+}
+
+type Player {
+  name: String!
+  type: String
+  tickets: Tickets
+}
+
+type MapLink {
+  source: Int!
+  target: Int!
+}
+
+type MapNode {
+  id: Int!
+  players: [Player!]
+  types: [String!]
+  x: Float
+  y: Float
+}
+
+type Map {
+  links: [MapLink!]
+  nodes: [MapNode!]
+}
+
+type ThiefMove {
+  type: String!
+  nodeId: String!
+}
+
+type HighlightedNode {
+  username: String
+  targetNodeId: String
+}
+
+type Game {
+  id: ID!
+  status: String
+  host: String
+  gameStatus: GameStatus
+  thiefMoves: [ThiefMove!]
+  players: [Player!]!
+  currentTurn: Player
+  map: Map
+  highlightedNodes: [HighlightedNode]
+}
+
+type Query {
+  waitingRoom: [Game]
+}
+
+type Mutation {
+  createGame(myself: String!): [Game]
+  startGame(id: ID!): Game
+  joinGame(id: ID!, myself: String!): Game
+  makeMove(id: ID!, myself: String!, targetNodeId: String!, ticket: String): Game
+  highlightNode(id: ID!, myself: String!, targetNodeId: String): Game
+}
+
+type Subscription {
+  onGameStateChange(id: ID!): Game @aws_subscribe(mutations: ["makeMove", "joinGame", "startGame", "highlightNode"])
+  onNewWaitingRoom: [Game] @aws_subscribe(mutations: ["createGame"])
+}

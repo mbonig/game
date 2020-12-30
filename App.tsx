@@ -3,6 +3,7 @@ import React, {useState} from 'react';
 
 import Amplify, {API, graphqlOperation} from 'aws-amplify'
 import config from './aws-exports'
+import newConfig from './aws-exports-new';
 import {NavigationContainer} from "@react-navigation/native";
 import {createStackNavigator} from "@react-navigation/stack";
 import {NewGame} from "./NewGame";
@@ -17,7 +18,7 @@ import {MapEditor} from "./MapEditor";
 import {useSessionStorage} from "./utils";
 import {Help} from "./Help";
 
-Amplify.configure(config)
+Amplify.configure({...config, ...newConfig});
 const Stack = createStackNavigator();
 
 export const User = React.createContext({

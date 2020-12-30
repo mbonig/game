@@ -1,7 +1,8 @@
 const AWS = require('aws-sdk');
 const ddb = new AWS.DynamoDB.DocumentClient();
 const TABLE = process.env.TABLE;
-
+const USES_SK = process.env.USES_SK;
+const INDEX_NAME = process.env.INDEX_NAME || "waitingRoom";
 const Crypto = require('crypto')
 
 function randomString(size = 6) {
@@ -13,7 +14,7 @@ function randomString(size = 6) {
 }
 
 function floatToTop(items, game) {
-  return items.sort((x,y)=>x.id === game.id ? -1 : 1);
+  return items.sort((x, y) => x.id === game.id ? -1 : 1);
 }
 
 exports.handler = async (event) => {
@@ -31,11 +32,16 @@ exports.handler = async (event) => {
     status: 'Waiting',
     host: myself
   }
+
+  // feature flag for new database table that supports sk
+  if (USES_SK) {
+    game.sk = game.id;
+  }
   await ddb.put({TableName: TABLE, Item: game}).promise();
 
   const {Items: items} = await ddb.query({
     TableName: TABLE,
-    IndexName: "waitingRoom",
+    IndexName: INDEX_NAME,
     KeyConditionExpression: "#status = :waiting",
     ExpressionAttributeValues: {
       ":waiting": "Waiting"
