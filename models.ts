@@ -1,4 +1,3 @@
-import React from "react";
 
 export enum TransportTypes {
   slow = "1_slow",

@@ -1,3 +1,439 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Snapshot 1`] = `Object {}`;
+exports[`Snapshot 1`] = `
+Object {
+  "Outputs": Object {
+    "appsyncGraphQLEndpointOutput": Object {
+      "Description": "Output for aws_appsync_graphqlEndpoint",
+      "Value": Object {
+        "Fn::GetAtt": Array [
+          "gameapiappsyncnestedstackNestedStackappsyncnestedstackNestedStackResource83C11ED4",
+          "Outputs.testgameapiappsyncnestedstackgameapiapi67279992GraphQLUrl",
+        ],
+      },
+    },
+  },
+  "Parameters": Object {
+    "AssetParameters07fef7367213c5bf00c0a57bc4813db9fbd1423d9e191f69ae2f0d12e25fc241ArtifactHashE2BB9B59": Object {
+      "Description": "Artifact hash for asset \\"07fef7367213c5bf00c0a57bc4813db9fbd1423d9e191f69ae2f0d12e25fc241\\"",
+      "Type": "String",
+    },
+    "AssetParameters07fef7367213c5bf00c0a57bc4813db9fbd1423d9e191f69ae2f0d12e25fc241S3BucketFE995707": Object {
+      "Description": "S3 bucket for asset \\"07fef7367213c5bf00c0a57bc4813db9fbd1423d9e191f69ae2f0d12e25fc241\\"",
+      "Type": "String",
+    },
+    "AssetParameters07fef7367213c5bf00c0a57bc4813db9fbd1423d9e191f69ae2f0d12e25fc241S3VersionKey5D9ED222": Object {
+      "Description": "S3 key for asset version \\"07fef7367213c5bf00c0a57bc4813db9fbd1423d9e191f69ae2f0d12e25fc241\\"",
+      "Type": "String",
+    },
+    "AssetParameters67b7823b74bc135986aa72f889d6a8da058d0c4a20cbc2dfc6f78995fdd2fc24ArtifactHashBA91B77F": Object {
+      "Description": "Artifact hash for asset \\"67b7823b74bc135986aa72f889d6a8da058d0c4a20cbc2dfc6f78995fdd2fc24\\"",
+      "Type": "String",
+    },
+    "AssetParameters67b7823b74bc135986aa72f889d6a8da058d0c4a20cbc2dfc6f78995fdd2fc24S3Bucket4D46ABB5": Object {
+      "Description": "S3 bucket for asset \\"67b7823b74bc135986aa72f889d6a8da058d0c4a20cbc2dfc6f78995fdd2fc24\\"",
+      "Type": "String",
+    },
+    "AssetParameters67b7823b74bc135986aa72f889d6a8da058d0c4a20cbc2dfc6f78995fdd2fc24S3VersionKeyB0F28861": Object {
+      "Description": "S3 key for asset version \\"67b7823b74bc135986aa72f889d6a8da058d0c4a20cbc2dfc6f78995fdd2fc24\\"",
+      "Type": "String",
+    },
+    "AssetParametersb651575e43ff24f88e40e2cefad132155ebc53515eaa4bb61c88d4f812ee5be5ArtifactHash37ABB87F": Object {
+      "Description": "Artifact hash for asset \\"b651575e43ff24f88e40e2cefad132155ebc53515eaa4bb61c88d4f812ee5be5\\"",
+      "Type": "String",
+    },
+    "AssetParametersb651575e43ff24f88e40e2cefad132155ebc53515eaa4bb61c88d4f812ee5be5S3Bucket9F32EB9B": Object {
+      "Description": "S3 bucket for asset \\"b651575e43ff24f88e40e2cefad132155ebc53515eaa4bb61c88d4f812ee5be5\\"",
+      "Type": "String",
+    },
+    "AssetParametersb651575e43ff24f88e40e2cefad132155ebc53515eaa4bb61c88d4f812ee5be5S3VersionKey687D33BB": Object {
+      "Description": "S3 key for asset version \\"b651575e43ff24f88e40e2cefad132155ebc53515eaa4bb61c88d4f812ee5be5\\"",
+      "Type": "String",
+    },
+  },
+  "Resources": Object {
+    "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aFD4BFC8A": Object {
+      "DependsOn": Array [
+        "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRoleDefaultPolicyADDA7DEB",
+        "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRole9741ECFB",
+      ],
+      "Properties": Object {
+        "Code": Object {
+          "S3Bucket": Object {
+            "Ref": "AssetParameters67b7823b74bc135986aa72f889d6a8da058d0c4a20cbc2dfc6f78995fdd2fc24S3Bucket4D46ABB5",
+          },
+          "S3Key": Object {
+            "Fn::Join": Array [
+              "",
+              Array [
+                Object {
+                  "Fn::Select": Array [
+                    0,
+                    Object {
+                      "Fn::Split": Array [
+                        "||",
+                        Object {
+                          "Ref": "AssetParameters67b7823b74bc135986aa72f889d6a8da058d0c4a20cbc2dfc6f78995fdd2fc24S3VersionKeyB0F28861",
+                        },
+                      ],
+                    },
+                  ],
+                },
+                Object {
+                  "Fn::Select": Array [
+                    1,
+                    Object {
+                      "Fn::Split": Array [
+                        "||",
+                        Object {
+                          "Ref": "AssetParameters67b7823b74bc135986aa72f889d6a8da058d0c4a20cbc2dfc6f78995fdd2fc24S3VersionKeyB0F28861",
+                        },
+                      ],
+                    },
+                  ],
+                },
+              ],
+            ],
+          },
+        },
+        "Handler": "index.handler",
+        "Role": Object {
+          "Fn::GetAtt": Array [
+            "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRole9741ECFB",
+            "Arn",
+          ],
+        },
+        "Runtime": "nodejs10.x",
+      },
+      "Type": "AWS::Lambda::Function",
+    },
+    "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRole9741ECFB": Object {
+      "Properties": Object {
+        "AssumeRolePolicyDocument": Object {
+          "Statement": Array [
+            Object {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": Object {
+                "Service": "lambda.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "ManagedPolicyArns": Array [
+          Object {
+            "Fn::Join": Array [
+              "",
+              Array [
+                "arn:",
+                Object {
+                  "Ref": "AWS::Partition",
+                },
+                ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+              ],
+            ],
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRoleDefaultPolicyADDA7DEB": Object {
+      "Properties": Object {
+        "PolicyDocument": Object {
+          "Statement": Array [
+            Object {
+              "Action": Array [
+                "logs:PutRetentionPolicy",
+                "logs:DeleteRetentionPolicy",
+              ],
+              "Effect": "Allow",
+              "Resource": "*",
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRoleDefaultPolicyADDA7DEB",
+        "Roles": Array [
+          Object {
+            "Ref": "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRole9741ECFB",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Policy",
+    },
+    "botmover4AF87A38": Object {
+      "DependsOn": Array [
+        "botmoverServiceRoleDefaultPolicy743208CC",
+        "botmoverServiceRoleCF90BC43",
+      ],
+      "Properties": Object {
+        "Code": Object {
+          "S3Bucket": Object {
+            "Ref": "AssetParametersb651575e43ff24f88e40e2cefad132155ebc53515eaa4bb61c88d4f812ee5be5S3Bucket9F32EB9B",
+          },
+          "S3Key": Object {
+            "Fn::Join": Array [
+              "",
+              Array [
+                Object {
+                  "Fn::Select": Array [
+                    0,
+                    Object {
+                      "Fn::Split": Array [
+                        "||",
+                        Object {
+                          "Ref": "AssetParametersb651575e43ff24f88e40e2cefad132155ebc53515eaa4bb61c88d4f812ee5be5S3VersionKey687D33BB",
+                        },
+                      ],
+                    },
+                  ],
+                },
+                Object {
+                  "Fn::Select": Array [
+                    1,
+                    Object {
+                      "Fn::Split": Array [
+                        "||",
+                        Object {
+                          "Ref": "AssetParametersb651575e43ff24f88e40e2cefad132155ebc53515eaa4bb61c88d4f812ee5be5S3VersionKey687D33BB",
+                        },
+                      ],
+                    },
+                  ],
+                },
+              ],
+            ],
+          },
+        },
+        "Environment": Object {
+          "Variables": Object {
+            "AWS_NODEJS_CONNECTION_REUSE_ENABLED": "1",
+          },
+        },
+        "Handler": "index.handler",
+        "Role": Object {
+          "Fn::GetAtt": Array [
+            "botmoverServiceRoleCF90BC43",
+            "Arn",
+          ],
+        },
+        "Runtime": "nodejs12.x",
+      },
+      "Type": "AWS::Lambda::Function",
+    },
+    "botmoverDynamoDBEventSourcetestgametable8A3B9165ED52B9E4": Object {
+      "Properties": Object {
+        "BatchSize": 100,
+        "EventSourceArn": Object {
+          "Fn::GetAtt": Array [
+            "gametableAE31DE88",
+            "StreamArn",
+          ],
+        },
+        "FunctionName": Object {
+          "Ref": "botmover4AF87A38",
+        },
+        "StartingPosition": "LATEST",
+      },
+      "Type": "AWS::Lambda::EventSourceMapping",
+    },
+    "botmoverLogRetentionF39CA71F": Object {
+      "Properties": Object {
+        "LogGroupName": Object {
+          "Fn::Join": Array [
+            "",
+            Array [
+              "/aws/lambda/",
+              Object {
+                "Ref": "botmover4AF87A38",
+              },
+            ],
+          ],
+        },
+        "RetentionInDays": 1,
+        "ServiceToken": Object {
+          "Fn::GetAtt": Array [
+            "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aFD4BFC8A",
+            "Arn",
+          ],
+        },
+      },
+      "Type": "Custom::LogRetention",
+    },
+    "botmoverServiceRoleCF90BC43": Object {
+      "Properties": Object {
+        "AssumeRolePolicyDocument": Object {
+          "Statement": Array [
+            Object {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": Object {
+                "Service": "lambda.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "ManagedPolicyArns": Array [
+          Object {
+            "Fn::Join": Array [
+              "",
+              Array [
+                "arn:",
+                Object {
+                  "Ref": "AWS::Partition",
+                },
+                ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+              ],
+            ],
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "botmoverServiceRoleDefaultPolicy743208CC": Object {
+      "Properties": Object {
+        "PolicyDocument": Object {
+          "Statement": Array [
+            Object {
+              "Action": "dynamodb:ListStreams",
+              "Effect": "Allow",
+              "Resource": "*",
+            },
+            Object {
+              "Action": Array [
+                "dynamodb:DescribeStream",
+                "dynamodb:GetRecords",
+                "dynamodb:GetShardIterator",
+              ],
+              "Effect": "Allow",
+              "Resource": Object {
+                "Fn::GetAtt": Array [
+                  "gametableAE31DE88",
+                  "StreamArn",
+                ],
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "botmoverServiceRoleDefaultPolicy743208CC",
+        "Roles": Array [
+          Object {
+            "Ref": "botmoverServiceRoleCF90BC43",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Policy",
+    },
+    "gameapiappsyncnestedstackNestedStackappsyncnestedstackNestedStackResource83C11ED4": Object {
+      "Properties": Object {
+        "TemplateURL": Object {
+          "Fn::Join": Array [
+            "",
+            Array [
+              "https://s3.",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              ".",
+              Object {
+                "Ref": "AWS::URLSuffix",
+              },
+              "/",
+              Object {
+                "Ref": "AssetParameters07fef7367213c5bf00c0a57bc4813db9fbd1423d9e191f69ae2f0d12e25fc241S3BucketFE995707",
+              },
+              "/",
+              Object {
+                "Fn::Select": Array [
+                  0,
+                  Object {
+                    "Fn::Split": Array [
+                      "||",
+                      Object {
+                        "Ref": "AssetParameters07fef7367213c5bf00c0a57bc4813db9fbd1423d9e191f69ae2f0d12e25fc241S3VersionKey5D9ED222",
+                      },
+                    ],
+                  },
+                ],
+              },
+              Object {
+                "Fn::Select": Array [
+                  1,
+                  Object {
+                    "Fn::Split": Array [
+                      "||",
+                      Object {
+                        "Ref": "AssetParameters07fef7367213c5bf00c0a57bc4813db9fbd1423d9e191f69ae2f0d12e25fc241S3VersionKey5D9ED222",
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          ],
+        },
+      },
+      "Type": "AWS::CloudFormation::Stack",
+    },
+    "gametableAE31DE88": Object {
+      "DeletionPolicy": "Retain",
+      "Properties": Object {
+        "AttributeDefinitions": Array [
+          Object {
+            "AttributeName": "id",
+            "AttributeType": "S",
+          },
+          Object {
+            "AttributeName": "sk",
+            "AttributeType": "S",
+          },
+          Object {
+            "AttributeName": "status",
+            "AttributeType": "S",
+          },
+        ],
+        "GlobalSecondaryIndexes": Array [
+          Object {
+            "IndexName": "waitingRoom",
+            "KeySchema": Array [
+              Object {
+                "AttributeName": "status",
+                "KeyType": "HASH",
+              },
+            ],
+            "Projection": Object {
+              "ProjectionType": "ALL",
+            },
+            "ProvisionedThroughput": Object {
+              "ReadCapacityUnits": 5,
+              "WriteCapacityUnits": 5,
+            },
+          },
+        ],
+        "KeySchema": Array [
+          Object {
+            "AttributeName": "id",
+            "KeyType": "HASH",
+          },
+          Object {
+            "AttributeName": "sk",
+            "KeyType": "RANGE",
+          },
+        ],
+        "ProvisionedThroughput": Object {
+          "ReadCapacityUnits": 5,
+          "WriteCapacityUnits": 5,
+        },
+        "StreamSpecification": Object {
+          "StreamViewType": "NEW_IMAGE",
+        },
+      },
+      "Type": "AWS::DynamoDB::Table",
+      "UpdateReplacePolicy": "Retain",
+    },
+  },
+}
+`;

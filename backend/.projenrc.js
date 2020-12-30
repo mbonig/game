@@ -8,6 +8,7 @@ const project = new AwsCdkTypeScriptApp({
   cdkDependencies: [
     "@aws-cdk/aws-dynamodb",
     "@aws-cdk/aws-lambda",
+    "@aws-cdk/aws-lambda-event-sources",
     "@aws-cdk/aws-lambda-nodejs",
   ],
   deps: ['cdk-appsync-transformer@^1.77.4'],

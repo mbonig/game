@@ -91,6 +91,11 @@
       "type": "runtime"
     },
     {
+      "name": "@aws-cdk/aws-lambda-event-sources",
+      "version": "^1.77.0",
+      "type": "runtime"
+    },
+    {
       "name": "@aws-cdk/aws-lambda-nodejs",
       "version": "^1.77.0",
       "type": "runtime"

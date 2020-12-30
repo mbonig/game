@@ -4,6 +4,9 @@ import * as path from "path";
 import {NodejsFunction} from "@aws-cdk/aws-lambda-nodejs";
 import {AttributeType, BillingMode, ProjectionType, StreamViewType, Table} from "@aws-cdk/aws-dynamodb";
 import {readdirSync} from 'fs';
+import {DynamoEventSource} from "@aws-cdk/aws-lambda-event-sources";
+import {StartingPosition} from "@aws-cdk/aws-lambda";
+import {RetentionDays} from "@aws-cdk/aws-logs";
 
 interface EthrwarsStackProps extends StackProps {
   functions: string[];
@@ -29,6 +32,8 @@ export class EthrwarsStack extends Stack {
     for (const functionName of props.functions) {
       this.createDataSource(functionName);
     }
+
+    this.createAIBots();
 
   }
 
@@ -80,6 +85,14 @@ export class EthrwarsStack extends Stack {
     this.transformer.addLambdaDataSourceAndResolvers(functionName + '-${env}', `${functionName}_datasource`, lambda, {});
 
     this.gameTable.grantReadWriteData(lambda);
+  }
+
+  private createAIBots() {
+    const botMoveLambda = new NodejsFunction(this, 'bot-mover', {
+      logRetention: RetentionDays.ONE_DAY
+    });
+    this.gameTable.grantStreamRead(botMoveLambda);
+    botMoveLambda.addEventSource(new DynamoEventSource(this.gameTable, {startingPosition: StartingPosition.LATEST}));
   }
 }
 
