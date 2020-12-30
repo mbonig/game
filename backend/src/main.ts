@@ -1,13 +1,15 @@
 import {App, Construct, Stack, StackProps} from '@aws-cdk/core';
 import {AppSyncTransformer} from 'cdk-appsync-transformer';
 import * as path from "path";
-import {IFunction} from "@aws-cdk/aws-lambda";
 import {NodejsFunction} from "@aws-cdk/aws-lambda-nodejs";
 import {AttributeType, BillingMode, ProjectionType, StreamViewType, Table} from "@aws-cdk/aws-dynamodb";
+import {readdirSync} from 'fs';
 
-export class MyStack extends Stack {
-  // @ts-ignore
-  private waitingRoomLambda: IFunction;
+interface EthrwarsStackProps extends StackProps {
+  functions: string[];
+}
+
+export class EthrwarsStack extends Stack {
   // @ts-ignore
   private gameTable: Table;
   // @ts-ignore
@@ -15,7 +17,7 @@ export class MyStack extends Stack {
   // @ts-ignore
   private waitingRoomIndexName: string;
 
-  constructor(scope: Construct, id: string, props: StackProps = {}) {
+  constructor(scope: Construct, id: string, props: EthrwarsStackProps) {
     super(scope, id, props);
 
     // define resources here...
@@ -24,16 +26,12 @@ export class MyStack extends Stack {
 
     this.createTable();
 
-
-    this.createDataSource('creategame');
-    this.createDataSource('highlightnode');
-    this.createDataSource('joingame');
-    this.createDataSource('makemove');
-    this.createDataSource('startgame');
-    this.createDataSource("waitingroom");
-
+    for (const functionName of props.functions) {
+      this.createDataSource(functionName);
+    }
 
   }
+
   private createTable() {
     this.gameTable = new Table(this, 'gametable', {
       partitionKey: {
@@ -62,11 +60,13 @@ export class MyStack extends Stack {
       projectionType: ProjectionType.ALL
     });
   }
+
   private createApi() {
     this.transformer = new AppSyncTransformer(this, 'game-api', {
       schemaPath: path.join(__dirname, '../../amplify/backend/api/ethrwars/schema.graphql')
     });
   }
+
   private createDataSource(functionName: string) {
     const lambda = new NodejsFunction(this, functionName + '-lambda', {
       entry: path.join(__dirname, `../../amplify/backend/function/${functionName}/src/index.js`),
@@ -91,7 +91,7 @@ const devEnv = {
 
 const app = new App();
 
-new MyStack(app, 'scotland-yard-api', {env: devEnv});
-// new MyStack(app, 'my-stack-prod', { env: prodEnv });
+const functionNames = readdirSync(path.join(__dirname, '../../amplify/backend/function'));
+new EthrwarsStack(app, 'scotland-yard-api', {env: devEnv, functions: functionNames});
 
 app.synth();
