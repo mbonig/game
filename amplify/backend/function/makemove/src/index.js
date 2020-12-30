@@ -191,6 +191,16 @@ exports.handler = async (event) => {
     return currentGame;
   }
 
+  // alright, we know this is a valid move, so let's record it:
+  if (USES_SK){
+    const timestamp = new Date().toISOString();
+    const moveWriteParams = {
+      TableName: TABLE,
+      Item : {id: currentGame.id, sk: `MOVE#${myself}#${timestamp}`, player: myself, timestamp, targetNodeId, ticket }
+    }
+    await ddb.put(moveWriteParams).promise();
+  }
+
   const isOver = checkWinState(targetNode, currentGame);
 
   const sourceNode = currentGame.map.nodes.find((n) => n.players.find((p) => p.name === currentGame.currentTurn.name));
