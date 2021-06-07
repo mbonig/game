@@ -13,26 +13,18 @@ interface EthrwarsStackProps extends StackProps {
 }
 
 export class EthrwarsStack extends Stack {
-  // @ts-ignore
-  private gameTable: Table;
-  // @ts-ignore
-  private transformer: AppSyncTransformer;
-  // @ts-ignore
-  private waitingRoomIndexName: string;
+  private gameTable!: Table;
+  private transformer!: AppSyncTransformer;
+  private waitingRoomIndexName!: string;
 
   constructor(scope: Construct, id: string, props: EthrwarsStackProps) {
     super(scope, id, props);
 
-    // define resources here...
-
     this.createApi();
-
     this.createTable();
-
     for (const functionName of props.functions) {
       this.createDataSource(functionName);
     }
-
     this.createAIBots();
 
   }
@@ -40,7 +32,7 @@ export class EthrwarsStack extends Stack {
   private createTable() {
     this.gameTable = new Table(this, 'gametable', {
       partitionKey: {
-        name: "id",
+        name: 'id',
         type: AttributeType.STRING
       },
       sortKey: {
@@ -53,7 +45,7 @@ export class EthrwarsStack extends Stack {
       stream: StreamViewType.NEW_IMAGE,
     });
 
-    this.waitingRoomIndexName = "waitingRoom";
+    this.waitingRoomIndexName = 'waitingRoom';
     this.gameTable.addGlobalSecondaryIndex({
       indexName: this.waitingRoomIndexName,
       partitionKey: {
